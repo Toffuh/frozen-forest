@@ -55,7 +55,7 @@ pub fn spawn_mobs_over_time(
 
     let mut random = rand::thread_rng();
 
-    for _i in 0..70 {
+    for _i in 0..3 {
         let random_x = random.gen_range(min_x..max_x);
 
         commands.spawn((
