@@ -1,12 +1,13 @@
 use crate::player::Player;
 use bevy::app::{App, Plugin, Update};
-use bevy::math::Vec2;
+use bevy::math::{vec2, Vec2};
 use bevy::prelude::{
-    default, Color, Commands, Component, Query, Res, ResMut, Resource, Sprite, SpriteBundle, Time,
-    Timer, Transform, With, Without,
+    default, Color, Commands, Component, Entity, EventReader, Events, Local, Query, Res, ResMut,
+    Resource, Sprite, SpriteBundle, Time, Timer, Transform, With, Without,
 };
 use bevy::time::TimerMode;
 use bevy::window::{PrimaryWindow, Window};
+use bevy_xpbd_2d::components::{Collider, LinearDamping, LinearVelocity, LockedAxes, RigidBody};
 use rand::Rng;
 use std::ops::Mul;
 
@@ -18,6 +19,7 @@ impl Plugin for MobPlugin {
         app.add_systems(Update, move_mob)
             .add_systems(Update, spawn_mobs_over_time)
             .add_systems(Update, tick_mob_spawn_timer)
+            .add_systems(Update, mob_hits_player)
             .init_resource::<MobSpawnTimer>();
     }
 }
@@ -38,6 +40,18 @@ impl Default for MobSpawnTimer {
 pub fn tick_mob_spawn_timer(mut mob_spawn_timer: ResMut<MobSpawnTimer>, time: Res<Time>) {
     mob_spawn_timer.timer.tick(time.delta());
 }
+
+// pub fn mob_hits_player(
+//     mut commands: Commands,
+//     mut player: Query<Entity, With<Player>>,
+//     mob_query: Query<With<Mob>>,
+// ) {
+//     if let Ok(player) = player.get_single_mut() {
+//         for mob in mob_query.iter() {
+//             commands.entity(player).despawn();
+//         }
+//     }
+// }
 
 pub fn spawn_mobs_over_time(
     mut commands: Commands,
@@ -60,6 +74,11 @@ pub fn spawn_mobs_over_time(
 
         commands.spawn((
             Mob,
+            RigidBody::Dynamic,
+            Collider::cuboid(50., 100.),
+            LinearVelocity(vec2(0., 0.)),
+            LinearDamping(20.),
+            LockedAxes::ROTATION_LOCKED,
             SpriteBundle {
                 sprite: Sprite {
                     color: Color::rgb(0.25, 0.75, 0.25),
