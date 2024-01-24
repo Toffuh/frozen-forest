@@ -1,5 +1,6 @@
 use crate::mob::MobPlugin;
 use crate::player::PlayerPlugin;
+use bevy::diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin};
 use bevy::prelude::*;
 
 mod mob;
@@ -11,6 +12,8 @@ fn main() {
         .add_plugins(PlayerPlugin)
         .add_plugins(MobPlugin)
         .add_systems(Startup, setup)
+        .insert_resource(Msaa::default())
+        .add_plugins((LogDiagnosticsPlugin::default(), FrameTimeDiagnosticsPlugin))
         .run();
 }
 
