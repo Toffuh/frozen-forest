@@ -1,4 +1,6 @@
+use bevy::math::{vec2, vec3};
 use bevy::prelude::*;
+use bevy_xpbd_2d::prelude::*;
 use std::ops::Mul;
 
 pub struct PlayerPlugin;
@@ -19,13 +21,18 @@ pub struct Player;
 pub fn player_setup(mut commands: Commands) {
     commands.spawn((
         Player,
+        RigidBody::Dynamic,
+        Collider::cuboid(50., 100.),
+        LinearVelocity(vec2(0., 0.)),
+        LinearDamping(20.),
+        LockedAxes::ROTATION_LOCKED,
         SpriteBundle {
             sprite: Sprite {
                 color: Color::rgb(0.25, 0.25, 0.75),
-                custom_size: Some(Vec2::new(50.0, 100.0)),
+                custom_size: Some(vec2(50., 100.)),
                 ..default()
             },
-            transform: Transform::from_translation(Vec3::new(0., 0., 0.)),
+            transform: Transform::from_translation(vec3(0., 0., 0.)),
             ..default()
         },
     ));
@@ -60,23 +67,19 @@ pub fn handle_keyboard_input(
         return;
     }
 
-    player_move_event.send(PlayerMoveEvent(direction.normalize()))
+    player_move_event.send(PlayerMoveEvent(direction))
 }
 
 pub fn move_player(
-    time: Res<Time>,
     mut player_move_events: EventReader<PlayerMoveEvent>,
-    mut player: Query<&mut Transform, With<Player>>,
+    mut player: Query<&mut LinearVelocity, With<Player>>,
 ) {
-    if let Ok(mut transform) = player.get_single_mut() {
+    if let Ok(mut velocity) = player.get_single_mut() {
         for player_move_event in player_move_events.read() {
-            let direction = player_move_event
-                .0
-                .mul(time.delta().as_secs_f32())
-                .mul(PLAYER_SPEED);
+            let direction = player_move_event.0.normalize_or_zero().mul(PLAYER_SPEED);
 
-            transform.translation.x += direction.x;
-            transform.translation.y += direction.y;
+            velocity.x = direction.x;
+            velocity.y = direction.y;
         }
     }
 }
