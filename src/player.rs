@@ -8,7 +8,8 @@ static PLAYER_SPEED: f32 = 500.;
 impl Plugin for PlayerPlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(Startup, player_setup)
-            .add_systems(Update, move_player);
+            .add_systems(Update, (handle_keyboard_input, move_player))
+            .add_event::<PlayerMoveEvent>();
     }
 }
 
@@ -30,10 +31,12 @@ pub fn player_setup(mut commands: Commands) {
     ));
 }
 
-pub fn move_player(
-    time: Res<Time>,
+#[derive(Event)]
+pub struct PlayerMoveEvent(Vec2);
+
+pub fn handle_keyboard_input(
     keys: Res<Input<KeyCode>>,
-    mut player: Query<&mut Transform, With<Player>>,
+    mut player_move_event: EventWriter<PlayerMoveEvent>,
 ) {
     let mut direction = Vec2::new(0., 0.);
 
@@ -53,13 +56,27 @@ pub fn move_player(
         direction.y -= 1.;
     }
 
-    let direction = direction
-        .normalize_or_zero()
-        .mul(time.delta().as_secs_f32())
-        .mul(PLAYER_SPEED);
+    if direction.length() == 0. {
+        return;
+    }
 
+    player_move_event.send(PlayerMoveEvent(direction.normalize()))
+}
+
+pub fn move_player(
+    time: Res<Time>,
+    mut player_move_events: EventReader<PlayerMoveEvent>,
+    mut player: Query<&mut Transform, With<Player>>,
+) {
     if let Ok(mut transform) = player.get_single_mut() {
-        transform.translation.x += direction.x;
-        transform.translation.y += direction.y;
+        for player_move_event in player_move_events.read() {
+            let direction = player_move_event
+                .0
+                .mul(time.delta().as_secs_f32())
+                .mul(PLAYER_SPEED);
+
+            transform.translation.x += direction.x;
+            transform.translation.y += direction.y;
+        }
     }
 }
