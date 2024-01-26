@@ -1,3 +1,4 @@
+use crate::entityData::EntityData;
 use crate::player::Player;
 use bevy::app::{App, Plugin, Update};
 use bevy::math::Vec2;
@@ -60,8 +61,10 @@ pub fn spawn_mobs_over_time(
 
         commands.spawn((
             Mob {
-                damage: 2,
-                health: 5,
+                entity_data: EntityData {
+                    damage: 1,
+                    health: 5,
+                },
             },
             SpriteBundle {
                 sprite: Sprite {
@@ -78,8 +81,7 @@ pub fn spawn_mobs_over_time(
 
 #[derive(Component)]
 pub struct Mob {
-    damage: usize,
-    health: usize,
+    entity_data: EntityData,
 }
 
 pub fn move_mob(

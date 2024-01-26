@@ -8,6 +8,7 @@ use bevy_xpbd_2d::plugins::PhysicsPlugins;
 mod mob;
 mod player;
 mod world;
+mod entityData;
 
 fn main() {
     App::new()
