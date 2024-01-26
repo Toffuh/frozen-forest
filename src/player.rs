@@ -16,11 +16,17 @@ impl Plugin for PlayerPlugin {
 }
 
 #[derive(Component)]
-pub struct Player;
+pub struct Player {
+    damage: usize,
+    health: usize,
+}
 
 pub fn player_setup(mut commands: Commands) {
     commands.spawn((
-        Player,
+        Player {
+            damage: 2,
+            health: 10,
+        },
         RigidBody::Dynamic,
         Collider::cuboid(50., 100.),
         LinearVelocity(vec2(0., 0.)),

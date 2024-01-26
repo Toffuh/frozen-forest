@@ -59,7 +59,10 @@ pub fn spawn_mobs_over_time(
         let random_x = random.gen_range(min_x..max_x);
 
         commands.spawn((
-            Mob,
+            Mob {
+                damage: 2,
+                health: 5,
+            },
             SpriteBundle {
                 sprite: Sprite {
                     color: Color::rgb(0.25, 0.75, 0.25),
@@ -74,7 +77,10 @@ pub fn spawn_mobs_over_time(
 }
 
 #[derive(Component)]
-pub struct Mob;
+pub struct Mob {
+    damage: usize,
+    health: usize,
+}
 
 pub fn move_mob(
     time: Res<Time>,
