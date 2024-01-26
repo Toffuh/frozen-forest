@@ -1,4 +1,5 @@
-use crate::entityData::EntityData;
+use crate::damage::Damage;
+use crate::health::Health;
 use bevy::math::{vec2, vec3};
 use bevy::prelude::*;
 use bevy_xpbd_2d::prelude::*;
@@ -17,18 +18,13 @@ impl Plugin for PlayerPlugin {
 }
 
 #[derive(Component)]
-pub struct Player {
-    entity_data: EntityData,
-}
+pub struct Player;
 
 pub fn player_setup(mut commands: Commands) {
     commands.spawn((
-        Player {
-            entity_data: EntityData {
-                damage: 1,
-                health: 5,
-            },
-        },
+        Player,
+        Damage(1),
+        Health(10),
         RigidBody::Dynamic,
         Collider::cuboid(50., 100.),
         LinearVelocity(vec2(0., 0.)),
