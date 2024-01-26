@@ -1,3 +1,5 @@
+use crate::damage::Damage;
+use crate::health::Health;
 use crate::player::Player;
 use bevy::app::{App, Plugin, Update};
 use bevy::math::Vec2;
@@ -55,11 +57,13 @@ pub fn spawn_mobs_over_time(
 
     let mut random = rand::thread_rng();
 
-    for _i in 0..70 {
+    for _i in 0..3 {
         let random_x = random.gen_range(min_x..max_x);
 
         commands.spawn((
             Mob,
+            Damage(1),
+            Health(10),
             SpriteBundle {
                 sprite: Sprite {
                     color: Color::rgb(0.25, 0.75, 0.25),
