@@ -1,13 +1,15 @@
 use crate::player::Player;
-use bevy::app::{App, Plugin, Update};
+use bevy::app::{App, Plugin, Startup, Update};
 use bevy::math::{vec2, Vec2};
 use bevy::prelude::{
-    default, Color, Commands, Component, Entity, EventReader, Events, Local, Query, Res, ResMut,
-    Resource, Sprite, SpriteBundle, Time, Timer, Transform, With, Without,
+    default, Color, Commands, Component, Query, Res, ResMut, Resource, Sprite, SpriteBundle, Time,
+    Timer, Transform, With, Without,
 };
 use bevy::time::TimerMode;
 use bevy::window::{PrimaryWindow, Window};
-use bevy_xpbd_2d::components::{Collider, LinearDamping, LinearVelocity, LockedAxes, RigidBody};
+use bevy_xpbd_2d::components::{
+    Collider, CollidingEntities, LinearDamping, LinearVelocity, LockedAxes, RigidBody,
+};
 use rand::Rng;
 use std::ops::Mul;
 
@@ -17,9 +19,10 @@ pub struct MobPlugin;
 impl Plugin for MobPlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(Update, move_mob)
-            .add_systems(Update, spawn_mobs_over_time)
-            .add_systems(Update, tick_mob_spawn_timer)
-            .add_systems(Update, mob_hits_player)
+            // .add_systems(Update, spawn_mobs_over_time)
+            // .add_systems(Update, tick_mob_spawn_timer)
+            .add_systems(Startup, spawn_mobs_over_time)
+            .add_systems(Update, apply_pressure_plate_colour)
             .init_resource::<MobSpawnTimer>();
     }
 }
@@ -41,26 +44,32 @@ pub fn tick_mob_spawn_timer(mut mob_spawn_timer: ResMut<MobSpawnTimer>, time: Re
     mob_spawn_timer.timer.tick(time.delta());
 }
 
-// pub fn mob_hits_player(
-//     mut commands: Commands,
-//     mut player: Query<Entity, With<Player>>,
-//     mob_query: Query<With<Mob>>,
-// ) {
-//     if let Ok(player) = player.get_single_mut() {
-//         for mob in mob_query.iter() {
-//             commands.entity(player).despawn();
-//         }
-//     }
-// }
+fn apply_pressure_plate_colour(
+    mut query: Query<(&mut Sprite, &CollidingEntities), With<Player>>,
+    mobs_query: Query<&Mob>,
+) {
+    for (mut sprite, colliding_entities) in &mut query {
+        let is_mob_colliding = colliding_entities
+            .0
+            .iter()
+            .any(|entity| mobs_query.get(*entity).is_ok());
+
+        if is_mob_colliding {
+            sprite.color = Color::rgb(1., 0., 0.); // color if touching
+        } else {
+            sprite.color = Color::rgb(0., 1., 0.); // color if not
+        }
+    }
+}
 
 pub fn spawn_mobs_over_time(
     mut commands: Commands,
     window_query: Query<&Window, With<PrimaryWindow>>,
     mob_spawn_timer: Res<MobSpawnTimer>,
 ) {
-    if !mob_spawn_timer.timer.finished() {
-        return;
-    }
+    // if !mob_spawn_timer.timer.finished() {
+    //     return;
+    // }
 
     let window = window_query.get_single().unwrap();
 
@@ -69,7 +78,7 @@ pub fn spawn_mobs_over_time(
 
     let mut random = rand::thread_rng();
 
-    for _i in 0..3 {
+    for _i in 0..1 {
         let random_x = random.gen_range(min_x..max_x);
 
         commands.spawn((
