@@ -1,17 +1,17 @@
 use crate::mob::MobPlugin;
 use crate::player::PlayerPlugin;
 use crate::world::WorldPlugin;
-use bevy::diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin};
+
+use crate::camera::CameraPlugin;
 use bevy::prelude::*;
 use bevy_xpbd_2d::plugins::PhysicsPlugins;
-use crate::camera::CameraPlugin;
 
+mod camera;
 mod damage;
 mod health;
 mod mob;
 mod player;
 mod world;
-mod camera;
 
 fn main() {
     App::new()

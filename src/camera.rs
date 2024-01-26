@@ -3,7 +3,6 @@ use bevy::app::App;
 use bevy::math::vec3;
 use bevy::prelude::*;
 use bevy_xpbd_2d::components::LinearVelocity;
-use std::ops::Mul;
 
 pub struct CameraPlugin;
 
