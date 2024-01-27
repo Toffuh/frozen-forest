@@ -82,7 +82,7 @@ pub struct Mob;
 
 pub fn move_mob(
     time: Res<Time>,
-    mut mob_query: Query<(&mut Transform), (With<Mob>, Without<Player>)>,
+    mut mob_query: Query<&mut Transform, (With<Mob>, Without<Player>)>,
     player_query: Query<&Transform, With<Player>>,
 ) {
     if let Ok(player_transform) = player_query.get_single() {
