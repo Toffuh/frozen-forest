@@ -7,13 +7,13 @@ use bevy::prelude::{
 };
 use bevy_xpbd_2d::components::CollidingEntities;
 
+static HIT_COOLDOWN: f32 = 1.;
+
 #[derive(Component)]
 pub struct Damage(pub f64);
 
 #[derive(Component)]
 pub struct Health(pub f64);
-
-static HIT_COOLDOWN: f32 = 1.;
 
 pub struct EntityPlugin;
 
@@ -34,6 +34,12 @@ impl Default for DamageTimer {
     fn default() -> DamageTimer {
         DamageTimer(Timer::from_seconds(HIT_COOLDOWN, TimerMode::Repeating))
     }
+}
+
+#[derive(Event)]
+pub struct EntityDamageEvent {
+    entity: Entity,
+    damage: f64,
 }
 
 pub fn deal_damage_on_collision(
@@ -88,10 +94,4 @@ pub fn remove_dead_entities(
     for dead_entity in event_reader.read() {
         commands.entity(dead_entity.0).despawn();
     }
-}
-
-#[derive(Event)]
-pub struct EntityDamageEvent {
-    entity: Entity,
-    damage: f64,
 }
