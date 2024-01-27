@@ -1,5 +1,3 @@
-use crate::mob::Mob;
-use crate::player::Player;
 use bevy::app::{App, Plugin, Update};
 use bevy::prelude::{
     Commands, Component, Entity, Event, EventReader, EventWriter, Query, Res, Time, Timer,
@@ -43,23 +41,23 @@ pub struct EntityDamageEvent {
 }
 
 pub fn deal_damage_on_collision(
-    query: Query<(&CollidingEntities, Entity), With<Player>>,
-    mut mobs_query: Query<(&mut DamageTimer, &Damage), With<Mob>>,
+    mut damageable_entities: Query<(&CollidingEntities, Entity), With<Health>>,
     time: Res<Time>,
     mut event_writer: EventWriter<EntityDamageEvent>,
+    mut attack_entitys: Query<(&mut DamageTimer, &Damage)>,
 ) {
-    if let Ok((colliding_entities, entity)) = query.get_single() {
+    for (colliding_entities, entity) in damageable_entities.iter_mut() {
         for colliding_entity in &colliding_entities.0 {
-            if let Ok((mut mob_timer, mob_damage)) = mobs_query.get_mut(*colliding_entity) {
-                mob_timer.0.tick(time.delta());
+            if let Ok((mut timer, damage)) = attack_entitys.get_mut(*colliding_entity) {
+                timer.0.tick(time.delta());
 
-                if !mob_timer.0.finished() {
+                if !timer.0.finished() {
                     continue;
                 }
 
                 event_writer.send(EntityDamageEvent {
                     entity,
-                    damage: mob_damage.0,
+                    damage: damage.0,
                 });
             }
         }
@@ -79,7 +77,7 @@ pub fn deal_damage(
         } else {
             *health -= entity_damage_event.damage;
 
-            println!("{}", health)
+            println!("{:?}: {}", entity_damage_event.entity, health)
         }
     }
 }
