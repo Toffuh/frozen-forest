@@ -5,6 +5,8 @@ use bevy::diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin};
 use bevy::prelude::*;
 use bevy_xpbd_2d::plugins::PhysicsPlugins;
 
+mod damage;
+mod health;
 mod mob;
 mod player;
 mod world;

@@ -1,3 +1,5 @@
+use crate::damage::Damage;
+use crate::health::Health;
 use crate::player::Player;
 use bevy::app::{App, Plugin, Startup, Update};
 use bevy::math::{vec2, Vec2};
@@ -88,6 +90,8 @@ pub fn spawn_mobs_over_time(
             LinearVelocity(vec2(0., 0.)),
             LinearDamping(20.),
             LockedAxes::ROTATION_LOCKED,
+            Damage(1),
+            Health(10),
             SpriteBundle {
                 sprite: Sprite {
                     color: Color::rgb(0.25, 0.75, 0.25),
