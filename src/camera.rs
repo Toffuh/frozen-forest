@@ -24,7 +24,7 @@ pub fn follow_player(
 ) {
     if let Ok((player_transform, player_velocity)) = player_query.get_single() {
         if let Ok(mut camera_transform) = camera_query.get_single_mut() {
-            println!("{:?}", player_velocity);
+            // println!("{:?}", player_velocity);
 
             let predicted_position = player_transform.translation.xy() + player_velocity.0 * 1.3;
             let predicted_position = vec3(predicted_position.x, predicted_position.y, 0.);

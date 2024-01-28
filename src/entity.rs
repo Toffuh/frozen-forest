@@ -77,7 +77,7 @@ pub fn deal_damage(
         } else {
             *health -= entity_damage_event.damage;
 
-            println!("{:?}: {}", entity_damage_event.entity, health)
+            // println!("{:?}: {}", entity_damage_event.entity, health)
         }
     }
 }

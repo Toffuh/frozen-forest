@@ -7,10 +7,8 @@ use crate::camera::CameraPlugin;
 use bevy::prelude::*;
 use bevy_xpbd_2d::plugins::PhysicsPlugins;
 
-mod entity;
 mod camera;
-mod damage;
-mod health;
+mod entity;
 mod mob;
 mod player;
 mod world;
@@ -22,12 +20,7 @@ fn main() {
         .add_plugins(WorldPlugin)
         .add_plugins(MobPlugin)
         .add_plugins(EntityPlugin)
-        .add_systems(Startup, setup)
         .insert_resource(Msaa::default())
         .add_plugins(CameraPlugin)
         .run();
-}
-
-pub fn setup(mut commands: Commands) {
-    commands.spawn(Camera2dBundle::default());
 }
