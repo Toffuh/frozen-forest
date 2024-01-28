@@ -1,5 +1,4 @@
-use crate::damage::Damage;
-use crate::health::Health;
+use crate::entity::{Damage, DamageTimer, Health};
 use bevy::math::{vec2, vec3};
 use bevy::prelude::*;
 use bevy_xpbd_2d::prelude::*;
@@ -23,9 +22,11 @@ pub struct Player;
 pub fn player_setup(mut commands: Commands) {
     commands.spawn((
         Player,
-        Damage(1),
-        Health(10),
+        Damage(1.),
+        Health(10.),
+        DamageTimer::default(),
         RigidBody::Dynamic,
+        Restitution::new(0.),
         Collider::cuboid(50., 100.),
         LinearVelocity(vec2(0., 0.)),
         LinearDamping(20.),
