@@ -1,4 +1,4 @@
-use crate::entity::{Damage, DamageTimer, Health};
+use crate::entity::{AttackableFrom, Damage, DamageTimer, Health, Layer, LayerType};
 use crate::player::Player;
 use bevy::app::{App, Plugin, Startup, Update};
 use bevy::math::{vec2, Vec2};
@@ -9,7 +9,7 @@ use bevy::prelude::{
 use bevy::time::TimerMode;
 use bevy::window::{PrimaryWindow, Window};
 use bevy_xpbd_2d::components::{Collider, LinearDamping, LinearVelocity, LockedAxes, RigidBody};
-use bevy_xpbd_2d::prelude::{ColliderDensity, Restitution};
+use bevy_xpbd_2d::prelude::{ColliderDensity, CollisionLayers, Restitution};
 use rand::Rng;
 use std::ops::Mul;
 
@@ -63,16 +63,18 @@ pub fn spawn_mobs_over_time(
 
         commands.spawn((
             Mob,
+            LayerType(Layer::Mob),
+            AttackableFrom(vec![Layer::Player]),
+            Damage(1.0),
+            Health(10.0),
             DamageTimer::default(),
             RigidBody::Dynamic,
+            Restitution::new(0.),
             Collider::cuboid(25., 50.),
             LinearVelocity(vec2(0., 0.)),
             LinearDamping(20.),
             LockedAxes::ROTATION_LOCKED,
             ColliderDensity(0.),
-            Restitution::new(0.),
-            Damage(1.0),
-            Health(10.0),
             SpriteBundle {
                 sprite: Sprite {
                     color: Color::rgb(0.25, 0.75, 0.25),

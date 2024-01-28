@@ -1,4 +1,4 @@
-use crate::entity::{Damage, DamageTimer, Health};
+use crate::entity::{AttackableFrom, Damage, DamageTimer, Health, Layer, LayerType};
 use bevy::math::{vec2, vec3};
 use bevy::prelude::*;
 use bevy_xpbd_2d::prelude::*;
@@ -22,8 +22,11 @@ pub struct Player;
 pub fn player_setup(mut commands: Commands) {
     commands.spawn((
         Player,
+        LayerType(Layer::Player),
+        //add here all layers which can make damage to a player
+        AttackableFrom(vec![Layer::Mob]),
         Damage(1.),
-        Health(10.),
+        Health(30.),
         DamageTimer::default(),
         RigidBody::Dynamic,
         Restitution::new(0.),
