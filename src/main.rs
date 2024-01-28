@@ -1,3 +1,5 @@
+#![allow(clippy::type_complexity)]
+
 use crate::mob::MobPlugin;
 use crate::player::PlayerPlugin;
 use crate::world::WorldPlugin;

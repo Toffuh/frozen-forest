@@ -1,37 +1,47 @@
-use crate::player::Player;
+use crate::player::{Player, PlayerMovementSet};
 use bevy::app::App;
-use bevy::math::vec3;
 use bevy::prelude::*;
 use bevy_xpbd_2d::components::LinearVelocity;
+use bevy_xpbd_2d::prelude::RigidBody;
+use bevy_xpbd_2d::PhysicsSet;
 
 pub struct CameraPlugin;
 
 impl Plugin for CameraPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(Startup, setup)
-            .add_systems(Update, follow_player);
+        app.add_systems(Startup, setup).add_systems(
+            Update,
+            follow_player
+                .after(PlayerMovementSet::PlayerMovement)
+                .before(PhysicsSet::Prepare),
+        );
     }
 }
 
 pub fn setup(mut commands: Commands) {
-    commands.spawn(Camera2dBundle::default());
+    commands.spawn((
+        Camera2dBundle::default(),
+        RigidBody::Kinematic,
+        LinearVelocity::ZERO,
+    ));
 }
 
 pub fn follow_player(
-    time: Res<Time>,
     player_query: Query<(&Transform, &LinearVelocity), With<Player>>,
-    mut camera_query: Query<&mut Transform, (With<Camera>, Without<Player>)>,
+    mut camera_query: Query<(&Transform, &mut LinearVelocity), (With<Camera>, Without<Player>)>,
 ) {
-    if let Ok((player_transform, player_velocity)) = player_query.get_single() {
-        if let Ok(mut camera_transform) = camera_query.get_single_mut() {
-            println!("{:?}", player_velocity);
+    let Ok((player_transform, player_velocity)) = player_query.get_single() else {
+        return;
+    };
 
-            let predicted_position = player_transform.translation.xy() + player_velocity.0 * 1.3;
-            let predicted_position = vec3(predicted_position.x, predicted_position.y, 0.);
+    let Ok((camera_transform, mut camera_velocity)) = camera_query.get_single_mut() else {
+        return;
+    };
 
-            let change = (predicted_position - camera_transform.translation) * time.delta_seconds();
+    let predicted_position = player_transform.translation.xy() + player_velocity.0 * 1.2;
 
-            camera_transform.translation += change;
-        }
-    }
+    let change = predicted_position - camera_transform.translation.xy();
+
+    camera_velocity.x = change.x;
+    camera_velocity.y = change.y;
 }
