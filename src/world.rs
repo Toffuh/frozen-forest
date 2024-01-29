@@ -1,4 +1,4 @@
-use crate::entity::Health;
+use crate::entity::{AttackableFrom, EntityTypes, Health};
 use bevy::math::vec2;
 use bevy::prelude::*;
 use bevy_xpbd_2d::prelude::*;
@@ -13,6 +13,9 @@ impl Plugin for WorldPlugin {
 
 fn setup(mut commands: Commands) {
     commands.spawn((
+        Health(20.),
+        EntityTypes::Wall,
+        AttackableFrom(vec![EntityTypes::Mob]),
         RigidBody::Static,
         Collider::cuboid(100., 100.),
         Restitution::new(0.),

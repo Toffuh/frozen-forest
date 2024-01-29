@@ -13,6 +13,16 @@ pub struct Damage(pub f64);
 #[derive(Component)]
 pub struct Health(pub f64);
 
+#[derive(PartialEq, Component)]
+pub enum EntityTypes {
+    Player,
+    Mob,
+    Wall,
+}
+
+#[derive(Component)]
+pub struct AttackableFrom(pub Vec<EntityTypes>);
+
 pub struct EntityPlugin;
 
 impl Plugin for EntityPlugin {
@@ -41,14 +51,18 @@ pub struct EntityDamageEvent {
 }
 
 pub fn deal_damage_on_collision(
-    mut damageable_entities: Query<(&CollidingEntities, Entity), With<Health>>,
+    mut damageable_entities: Query<(&CollidingEntities, Entity, &AttackableFrom), With<Health>>,
     time: Res<Time>,
     mut event_writer: EventWriter<EntityDamageEvent>,
-    mut attack_entitys: Query<(&mut DamageTimer, &Damage)>,
+    mut attack_entitys: Query<(&mut DamageTimer, &Damage, &EntityTypes)>,
 ) {
-    for (colliding_entities, entity) in damageable_entities.iter_mut() {
+    for (colliding_entities, damageable_entity, attackable_from) in damageable_entities.iter_mut() {
         for colliding_entity in &colliding_entities.0 {
-            if let Ok((mut timer, damage)) = attack_entitys.get_mut(*colliding_entity) {
+            if let Ok((mut timer, damage, layer_type)) = attack_entitys.get_mut(*colliding_entity) {
+                if !attackable_from.0.contains(&layer_type) {
+                    continue;
+                }
+
                 timer.0.tick(time.delta());
 
                 if !timer.0.finished() {
@@ -56,7 +70,7 @@ pub fn deal_damage_on_collision(
                 }
 
                 event_writer.send(EntityDamageEvent {
-                    entity,
+                    entity: damageable_entity,
                     damage: damage.0,
                 });
             }
