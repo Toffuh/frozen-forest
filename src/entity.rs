@@ -13,7 +13,7 @@ pub struct Damage(pub f64);
 #[derive(Component)]
 pub struct Health(pub f64);
 
-#[derive(PartialEq)]
+#[derive(PartialEq, Component)]
 pub enum EntityTypes {
     Player,
     Mob,
@@ -22,9 +22,6 @@ pub enum EntityTypes {
 
 #[derive(Component)]
 pub struct AttackableFrom(pub Vec<EntityTypes>);
-
-#[derive(Component)]
-pub struct LayerType(pub EntityTypes);
 
 pub struct EntityPlugin;
 
@@ -57,12 +54,12 @@ pub fn deal_damage_on_collision(
     mut damageable_entities: Query<(&CollidingEntities, Entity, &AttackableFrom), With<Health>>,
     time: Res<Time>,
     mut event_writer: EventWriter<EntityDamageEvent>,
-    mut attack_entitys: Query<(&mut DamageTimer, &Damage, &LayerType)>,
+    mut attack_entitys: Query<(&mut DamageTimer, &Damage, &EntityTypes)>,
 ) {
     for (colliding_entities, damageable_entity, attackable_from) in damageable_entities.iter_mut() {
         for colliding_entity in &colliding_entities.0 {
             if let Ok((mut timer, damage, layer_type)) = attack_entitys.get_mut(*colliding_entity) {
-                if !attackable_from.0.contains(&layer_type.0) {
+                if !attackable_from.0.contains(&layer_type) {
                     continue;
                 }
 
