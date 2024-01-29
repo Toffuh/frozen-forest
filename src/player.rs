@@ -1,3 +1,4 @@
+use crate::player::PlayerMovementSet::PlayerMovement;
 use crate::entity::{AttackableFrom, Damage, DamageTimer, EntityTypes, Health};
 use bevy::math::{vec2, vec3};
 use bevy::prelude::*;
@@ -8,10 +9,18 @@ pub struct PlayerPlugin;
 
 static PLAYER_SPEED: f32 = 500.;
 
+#[derive(SystemSet, Clone, Debug, Eq, Hash, PartialEq)]
+pub enum PlayerMovementSet {
+    PlayerMovement,
+}
+
 impl Plugin for PlayerPlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(Startup, player_setup)
-            .add_systems(Update, (handle_keyboard_input, move_player))
+            .add_systems(
+                Update,
+                (handle_keyboard_input, (move_player).in_set(PlayerMovement)).chain(),
+            )
             .add_event::<PlayerMoveEvent>();
     }
 }
