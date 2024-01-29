@@ -1,9 +1,8 @@
-use crate::player::{Player, PlayerMovementSet};
+use crate::player::Player;
 use bevy::app::App;
 use bevy::prelude::*;
 use bevy_xpbd_2d::components::LinearVelocity;
 use bevy_xpbd_2d::prelude::{Position, PreviousPosition, RigidBody};
-use bevy_xpbd_2d::PhysicsSet;
 
 pub struct CameraPlugin;
 

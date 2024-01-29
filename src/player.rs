@@ -1,5 +1,3 @@
-use crate::damage::Damage;
-use crate::health::Health;
 use crate::player::PlayerMovementSet::PlayerMovement;
 use crate::entity::{AttackableFrom, Damage, DamageTimer, EntityTypes, Health};
 use bevy::math::{vec2, vec3};
