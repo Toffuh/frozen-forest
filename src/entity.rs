@@ -14,17 +14,17 @@ pub struct Damage(pub f64);
 pub struct Health(pub f64);
 
 #[derive(PartialEq)]
-pub enum Layer {
+pub enum EntityTypes {
     Player,
     Mob,
     Wall,
 }
 
 #[derive(Component)]
-pub struct AttackableFrom(pub Vec<Layer>);
+pub struct AttackableFrom(pub Vec<EntityTypes>);
 
 #[derive(Component)]
-pub struct LayerType(pub Layer);
+pub struct LayerType(pub EntityTypes);
 
 pub struct EntityPlugin;
 

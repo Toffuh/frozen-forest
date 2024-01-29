@@ -1,4 +1,4 @@
-use crate::entity::{AttackableFrom, Damage, DamageTimer, Health, Layer, LayerType};
+use crate::entity::{AttackableFrom, Damage, DamageTimer, EntityTypes, Health, LayerType};
 use crate::player::Player;
 use bevy::app::{App, Plugin, Startup, Update};
 use bevy::math::{vec2, Vec2};
@@ -63,8 +63,8 @@ pub fn spawn_mobs_over_time(
 
         commands.spawn((
             Mob,
-            LayerType(Layer::Mob),
-            AttackableFrom(vec![Layer::Player]),
+            LayerType(EntityTypes::Mob),
+            AttackableFrom(vec![EntityTypes::Player]),
             Damage(1.0),
             Health(10.0),
             DamageTimer::default(),
