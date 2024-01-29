@@ -1,6 +1,7 @@
 use crate::damage::Damage;
 use crate::health::Health;
 use crate::player::PlayerMovementSet::PlayerMovement;
+use crate::entity::{AttackableFrom, Damage, DamageTimer, EntityTypes, Health};
 use bevy::math::{vec2, vec3};
 use bevy::prelude::*;
 use bevy_xpbd_2d::prelude::*;
@@ -32,9 +33,14 @@ pub struct Player;
 pub fn player_setup(mut commands: Commands) {
     commands.spawn((
         Player,
-        Damage(1),
-        Health(10),
+        EntityTypes::Player,
+        //add here all layers which can make damage to a player
+        AttackableFrom(vec![EntityTypes::Mob]),
+        Damage(1.),
+        Health(30.),
+        DamageTimer::default(),
         RigidBody::Dynamic,
+        Restitution::new(0.),
         Collider::cuboid(50., 100.),
         LinearVelocity(vec2(0., 0.)),
         LinearDamping(20.),
