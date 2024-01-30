@@ -1,16 +1,17 @@
 use bevy::app::{App, Plugin, Startup, Update};
 use bevy::math::{vec2, Vec2};
 use bevy::prelude::{
-    default, Color, Commands, Component, Query, Res, ResMut, Resource, Sprite, SpriteBundle, Time,
-    Timer, Transform, With, Without,
+    default, Color, Commands, Query, Sprite, SpriteBundle, Transform, With, Without,
 };
-use bevy::time::TimerMode;
+
+use crate::entities::data::{
+    AttackTimer, AttackableFrom, Damage, EntityType, Health, Mob, Player, MOB_SPEED,
+};
 use bevy::window::{PrimaryWindow, Window};
 use bevy_xpbd_2d::components::{Collider, LinearDamping, LinearVelocity, LockedAxes, RigidBody};
 use bevy_xpbd_2d::prelude::{ColliderDensity, Restitution};
 use rand::Rng;
 use std::ops::Mul;
-use crate::entities::data::{AttackableFrom, AttackTimer, Damage, EntityType, Health, Mob, MOB_SPEED, Player};
 
 pub struct MobPlugin;
 impl Plugin for MobPlugin {

@@ -1,5 +1,4 @@
-use bevy::math::Vec2;
-use bevy::prelude::{Component, Entity, Event, Timer, TimerMode};
+use bevy::prelude::{Component, Timer, TimerMode};
 
 pub static ATTACK_COOLDOWN: f32 = 1.;
 

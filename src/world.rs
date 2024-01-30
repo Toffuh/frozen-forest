@@ -1,4 +1,4 @@
-use crate::entities::entity::{AttackableFrom, EntityType, Health};
+use crate::entities::data::{AttackableFrom, EntityType, Health};
 use bevy::math::vec2;
 use bevy::prelude::*;
 use bevy_xpbd_2d::prelude::*;

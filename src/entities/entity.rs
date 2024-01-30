@@ -1,10 +1,7 @@
 use crate::entities::data::{AttackTimer, AttackableFrom, Damage, EntityType, Health};
 use crate::entities::event::{EntityDamageEvent, EntityDeathEvent};
 use bevy::app::{App, Plugin, Update};
-use bevy::prelude::{
-    Commands, Component, Entity, Event, EventReader, EventWriter, Query, Res, Time, Timer,
-    TimerMode, With,
-};
+use bevy::prelude::{Commands, Entity, EventReader, EventWriter, Query, Res, Time, With};
 use bevy_xpbd_2d::components::CollidingEntities;
 
 pub struct EntityPlugin;
@@ -32,7 +29,7 @@ pub fn deal_damage_on_collision(
                 continue;
             };
 
-            if !attackable_from.0.contains(&entity_type) {
+            if !attackable_from.0.contains(entity_type) {
                 continue;
             }
 
