@@ -1,5 +1,3 @@
-use crate::entity::{AttackableFrom, Damage, DamageTimer, EntityTypes, Health};
-use crate::player::Player;
 use bevy::app::{App, Plugin, Startup, Update};
 use bevy::math::{vec2, Vec2};
 use bevy::prelude::{
@@ -9,48 +7,20 @@ use bevy::prelude::{
 use bevy::time::TimerMode;
 use bevy::window::{PrimaryWindow, Window};
 use bevy_xpbd_2d::components::{Collider, LinearDamping, LinearVelocity, LockedAxes, RigidBody};
-use bevy_xpbd_2d::prelude::{ColliderDensity, CollisionLayers, Restitution};
+use bevy_xpbd_2d::prelude::{ColliderDensity, Restitution};
 use rand::Rng;
 use std::ops::Mul;
-
-static MOB_SPEED: f32 = 200.;
-static MOB_SPAWN_TIME: f32 = 5.;
+use crate::entities::data::{AttackableFrom, AttackTimer, Damage, EntityType, Health, Mob, MOB_SPEED, Player};
 
 pub struct MobPlugin;
 impl Plugin for MobPlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(Update, move_mob)
-            // .add_systems(Update, spawn_mobs_over_time)
-            // .add_systems(Update, tick_mob_spawn_timer)
-            .add_systems(Startup, spawn_mobs_over_time)
-            .init_resource::<MobSpawnTimer>();
+            .add_systems(Startup, spawn_mobs);
     }
 }
 
-#[derive(Resource)]
-pub struct MobSpawnTimer {
-    pub timer: Timer,
-}
-impl Default for MobSpawnTimer {
-    fn default() -> MobSpawnTimer {
-        MobSpawnTimer {
-            timer: Timer::from_seconds(MOB_SPAWN_TIME, TimerMode::Repeating),
-        }
-    }
-}
-pub fn tick_mob_spawn_timer(mut mob_spawn_timer: ResMut<MobSpawnTimer>, time: Res<Time>) {
-    mob_spawn_timer.timer.tick(time.delta());
-}
-
-pub fn spawn_mobs_over_time(
-    mut commands: Commands,
-    window_query: Query<&Window, With<PrimaryWindow>>,
-    mob_spawn_timer: Res<MobSpawnTimer>,
-) {
-    // if !mob_spawn_timer.timer.finished() {
-    //     return;
-    // }
-
+pub fn spawn_mobs(mut commands: Commands, window_query: Query<&Window, With<PrimaryWindow>>) {
     let window = window_query.get_single().unwrap();
 
     let min_x = -(window.width() / 2.);
@@ -63,11 +33,11 @@ pub fn spawn_mobs_over_time(
 
         commands.spawn((
             Mob,
-            EntityTypes::Mob,
-            AttackableFrom(vec![EntityTypes::Player]),
+            EntityType::Mob,
+            AttackableFrom(vec![EntityType::Player]),
             Damage(1.0),
             Health(10.0),
-            DamageTimer::default(),
+            AttackTimer::default(),
             RigidBody::Dynamic,
             Restitution::new(0.),
             Collider::cuboid(25., 50.),
@@ -87,9 +57,6 @@ pub fn spawn_mobs_over_time(
         ));
     }
 }
-
-#[derive(Component)]
-pub struct Mob;
 
 pub fn move_mob(
     mut mob_query: Query<(&mut LinearVelocity, &Transform), (With<Mob>, Without<Player>)>,

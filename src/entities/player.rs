@@ -1,5 +1,6 @@
-use crate::player::PlayerMovementSet::PlayerMovement;
-use crate::entity::{AttackableFrom, Damage, DamageTimer, EntityTypes, Health};
+use crate::entities::data::{AttackTimer, AttackableFrom, Damage, EntityType, Health, Player};
+use crate::entities::event::PlayerMoveEvent;
+use crate::entities::player::PlayerMovementSet::PlayerMovement;
 use bevy::math::{vec2, vec3};
 use bevy::prelude::*;
 use bevy_xpbd_2d::prelude::*;
@@ -16,27 +17,22 @@ pub enum PlayerMovementSet {
 
 impl Plugin for PlayerPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(Startup, player_setup)
-            .add_systems(
-                Update,
-                (handle_keyboard_input, (move_player).in_set(PlayerMovement)).chain(),
-            )
-            .add_event::<PlayerMoveEvent>();
+        app.add_systems(Startup, player_setup).add_systems(
+            Update,
+            (handle_keyboard_input, (move_player).in_set(PlayerMovement)).chain(),
+        );
     }
 }
-
-#[derive(Component)]
-pub struct Player;
 
 pub fn player_setup(mut commands: Commands) {
     commands.spawn((
         Player,
-        EntityTypes::Player,
+        EntityType::Player,
         //add here all layers which can make damage to a player
-        AttackableFrom(vec![EntityTypes::Mob]),
+        AttackableFrom(vec![EntityType::Mob]),
         Damage(1.),
         Health(30.),
-        DamageTimer::default(),
+        AttackTimer::default(),
         RigidBody::Dynamic,
         Restitution::new(0.),
         Collider::cuboid(50., 100.),
@@ -54,9 +50,6 @@ pub fn player_setup(mut commands: Commands) {
         },
     ));
 }
-
-#[derive(Event)]
-pub struct PlayerMoveEvent(Vec2);
 
 pub fn handle_keyboard_input(
     keys: Res<Input<KeyCode>>,
@@ -91,12 +84,14 @@ pub fn move_player(
     mut player_move_events: EventReader<PlayerMoveEvent>,
     mut player: Query<&mut LinearVelocity, With<Player>>,
 ) {
-    if let Ok(mut velocity) = player.get_single_mut() {
-        for player_move_event in player_move_events.read() {
-            let direction = player_move_event.0.normalize_or_zero().mul(PLAYER_SPEED);
+    let Ok(mut velocity) = player.get_single_mut() else {
+        return;
+    };
 
-            velocity.x = direction.x;
-            velocity.y = direction.y;
-        }
+    for player_move_event in player_move_events.read() {
+        let direction = player_move_event.0.normalize_or_zero().mul(PLAYER_SPEED);
+
+        velocity.x = direction.x;
+        velocity.y = direction.y;
     }
 }
