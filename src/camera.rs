@@ -1,4 +1,4 @@
-use crate::player::Player;
+use crate::entities::data::Player;
 use bevy::app::App;
 use bevy::prelude::*;
 use bevy_xpbd_2d::components::LinearVelocity;
