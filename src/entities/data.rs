@@ -3,6 +3,7 @@ use bevy::prelude::{Component, Timer, TimerMode};
 pub static ATTACK_COOLDOWN: f32 = 1.;
 
 pub static MOB_SPEED: f32 = 200.;
+pub static PLAYER_SPEED: f32 = 500.;
 
 #[derive(Component)]
 pub struct Damage(pub f64);
