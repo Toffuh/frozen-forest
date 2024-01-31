@@ -1,5 +1,6 @@
 use crate::entities::data::{
-    AttackTimer, AttackableFrom, Damage, EntityType, Health, Player, PLAYER_SPEED,
+    AttackTimer, AttackableFrom, Damage, EntityType, Health, Player, MAX_PLAYER_HEALTH,
+    PLAYER_SPEED,
 };
 use crate::entities::event::PlayerMoveEvent;
 use bevy::math::{vec2, vec3};
@@ -23,7 +24,7 @@ pub fn player_setup(mut commands: Commands) {
         //add here all layers which can make damage to a player
         AttackableFrom(vec![EntityType::Mob]),
         Damage(1.),
-        Health(30.),
+        Health(MAX_PLAYER_HEALTH),
         AttackTimer::default(),
         RigidBody::Dynamic,
         Restitution::new(0.),
