@@ -11,7 +11,7 @@ impl Plugin for WorldPlugin {
     }
 }
 
-pub static TILE_SIZE: usize = 200;
+pub static TILE_SIZE: usize = 300;
 
 #[derive(Component)]
 pub struct Tile;
