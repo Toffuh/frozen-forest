@@ -11,6 +11,11 @@ impl Plugin for WorldPlugin {
     }
 }
 
+pub static TILE_SIZE: usize = 300;
+
+#[derive(Component)]
+pub struct Tile;
+
 fn setup(mut commands: Commands) {
     commands.spawn((
         Health(20.),
@@ -28,5 +33,56 @@ fn setup(mut commands: Commands) {
             transform: Transform::from_translation(Vec3::new(100., 100., 0.)),
             ..default()
         },
+    ));
+
+    for x in -5..=5isize {
+        for y in -5..=5isize {
+            if vec2(x as f32, y as f32).length() > 4. {
+                blocked_normal_tile(&mut commands, x, y);
+            } else {
+                normal_tile(&mut commands, x, y);
+            }
+        }
+    }
+}
+
+fn normal_tile(commands: &mut Commands, x: isize, y: isize) {
+    commands.spawn((
+        Tile,
+        SpriteBundle {
+            sprite: Sprite {
+                color: Color::rgb(0.0, 0.2, 0.1),
+                custom_size: Some(vec2(TILE_SIZE as f32, TILE_SIZE as f32)),
+                ..default()
+            },
+            transform: Transform::from_translation(Vec3::new(
+                x as f32 * TILE_SIZE as f32,
+                y as f32 * TILE_SIZE as f32,
+                -5.,
+            )),
+            ..default()
+        },
+    ));
+}
+
+fn blocked_normal_tile(commands: &mut Commands, x: isize, y: isize) {
+    commands.spawn((
+        Tile,
+        SpriteBundle {
+            sprite: Sprite {
+                color: Color::rgb(1.0, 0.2, 0.1),
+                custom_size: Some(vec2(TILE_SIZE as f32, TILE_SIZE as f32)),
+                ..default()
+            },
+            transform: Transform::from_translation(Vec3::new(
+                x as f32 * TILE_SIZE as f32,
+                y as f32 * TILE_SIZE as f32,
+                -5.,
+            )),
+            ..default()
+        },
+        RigidBody::Static,
+        Collider::cuboid(TILE_SIZE as f32, TILE_SIZE as f32),
+        Restitution::new(0.),
     ));
 }
