@@ -46,3 +46,12 @@ impl Default for PlayerAttackTimer {
         PlayerAttackTimer(Timer::from_seconds(PLAYER_ATTACK_COOLDOWN, TimerMode::Once))
     }
 }
+
+#[derive(Component)]
+pub struct DamageCoolDown(pub Timer);
+
+impl DamageCoolDown {
+    pub fn new(seconds: f32) -> DamageCoolDown {
+        DamageCoolDown(Timer::from_seconds(seconds, TimerMode::Once))
+    }
+}

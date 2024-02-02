@@ -8,6 +8,7 @@ edition = "2021"
 [dependencies]
 bevy = { version = "0.12.1", features = ["dynamic_linking", "wayland"] }
 bevy_xpbd_2d = "0.3.3"
+iter_tools = "0.4.0"
 rand = "0.8.5"
 
 # Enable a small amount of optimization in debug mode

@@ -6,8 +6,7 @@ use crate::entities::EntityPlugins;
 use crate::ui::UIPlugin;
 use crate::world::WorldPlugin;
 use bevy::prelude::*;
-use bevy_xpbd_2d::plugins::{PhysicsDebugPlugin, PhysicsPlugins};
-use bevy_xpbd_2d::prelude::PhysicsDebugConfig;
+use bevy_xpbd_2d::plugins::PhysicsPlugins;
 
 pub mod camera;
 pub mod entities;

@@ -1,8 +1,13 @@
-use crate::entities::data::{AttackTimer, AttackableFrom, Damage, EntityType, Health, Player};
+use crate::entities::data::{
+    AttackTimer, AttackableFrom, Damage, DamageCoolDown, EntityType, Health, Mob, Player,
+};
 use crate::entities::event::{EntityDamageEvent, EntityDeathEvent};
 use bevy::app::{App, Plugin, Update};
-use bevy::prelude::{Commands, Entity, EventReader, EventWriter, Query, Res, Time, With, Without};
+use bevy::prelude::{
+    Color, Commands, Entity, EventReader, EventWriter, Or, Query, Res, Sprite, Time, With, Without,
+};
 use bevy_xpbd_2d::components::CollidingEntities;
+use iter_tools::Itertools;
 
 pub struct EntityPlugin;
 
@@ -11,6 +16,14 @@ impl Plugin for EntityPlugin {
         app.add_systems(
             Update,
             (deal_damage_on_collision, deal_damage, remove_dead_entities),
+        )
+        .add_systems(
+            Update,
+            (
+                tick_damage_cool_down,
+                remove_damage_cool_down,
+                color_mob_on_damage,
+            ),
         );
     }
 }
@@ -48,19 +61,28 @@ pub fn deal_damage_on_collision(
 }
 
 pub fn deal_damage(
+    mut commands: Commands,
     mut event_writer: EventWriter<EntityDeathEvent>,
     mut event_reader: EventReader<EntityDamageEvent>,
-    mut health: Query<&mut Health>,
+    mut health: Query<&mut Health, Without<DamageCoolDown>>,
 ) {
-    for entity_damage_event in event_reader.read() {
-        let health = &mut health.get_mut(entity_damage_event.entity).unwrap().0;
+    for event in event_reader
+        .read()
+        .dedup_by(|event_a, event_b| event_a.entity == event_b.entity)
+    {
+        let Ok(mut health) = health.get_mut(event.entity) else {
+            return;
+        };
 
-        if *health - entity_damage_event.damage <= 0. {
-            event_writer.send(EntityDeathEvent(entity_damage_event.entity));
-            continue;
+        if health.0 - event.damage <= 0. {
+            event_writer.send(EntityDeathEvent(event.entity));
+            return;
         }
 
-        *health -= entity_damage_event.damage;
+        commands
+            .entity(event.entity)
+            .insert(DamageCoolDown::new(0.3));
+        health.0 -= event.damage;
     }
 }
 
@@ -70,5 +92,32 @@ pub fn remove_dead_entities(
 ) {
     for dead_entity in event_reader.read() {
         commands.entity(dead_entity.0).despawn();
+    }
+}
+
+pub fn tick_damage_cool_down(time: Res<Time>, mut entities: Query<&mut DamageCoolDown>) {
+    for mut cool_down in entities.iter_mut() {
+        cool_down.0.tick(time.delta());
+    }
+}
+
+pub fn remove_damage_cool_down(mut commands: Commands, entities: Query<(Entity, &DamageCoolDown)>) {
+    for (entity, _) in entities
+        .iter()
+        .filter(|(_, cool_down)| cool_down.0.finished())
+    {
+        commands.entity(entity).remove::<DamageCoolDown>();
+    }
+}
+
+pub fn color_mob_on_damage(
+    mut mobs: Query<(Option<&DamageCoolDown>, &mut Sprite), Or<(With<Player>, With<Mob>)>>,
+) {
+    for (cool_down, mut sprite) in mobs.iter_mut() {
+        if cool_down.is_some() {
+            sprite.color = Color::rgb(1., 0.75, 0.25)
+        } else {
+            sprite.color = Color::rgb(0.25, 0.75, 0.25)
+        }
     }
 }
