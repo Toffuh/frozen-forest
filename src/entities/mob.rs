@@ -5,7 +5,7 @@ use bevy::prelude::{
 };
 
 use crate::entities::data::{
-    AttackTimer, AttackableFrom, Damage, EntityType, Health, Mob, Player, MOB_SPEED,
+    AttackTimer, AttackableFrom, Damage, EntityType, Health, Mob, Player, MOB_RADIUS, MOB_SPEED,
 };
 use bevy::window::{PrimaryWindow, Window};
 use bevy_xpbd_2d::components::{Collider, LinearDamping, LinearVelocity, LockedAxes, RigidBody};
@@ -41,7 +41,7 @@ pub fn spawn_mobs(mut commands: Commands, window_query: Query<&Window, With<Prim
             AttackTimer::default(),
             RigidBody::Dynamic,
             Restitution::new(0.),
-            Collider::cuboid(25., 50.),
+            Collider::ball(MOB_RADIUS),
             LinearVelocity(vec2(0., 0.)),
             LinearDamping(20.),
             LockedAxes::ROTATION_LOCKED,
@@ -49,7 +49,7 @@ pub fn spawn_mobs(mut commands: Commands, window_query: Query<&Window, With<Prim
             SpriteBundle {
                 sprite: Sprite {
                     color: Color::rgb(0.25, 0.75, 0.25),
-                    custom_size: Some(Vec2::new(25.0, 50.0)),
+                    custom_size: Some(Vec2::new(MOB_RADIUS * 2., MOB_RADIUS * 2.)),
                     ..default()
                 },
                 transform: Transform::from_xyz(random_x, -window.height() / 2. + 50., 0.),

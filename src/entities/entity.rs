@@ -1,7 +1,7 @@
-use crate::entities::data::{AttackTimer, AttackableFrom, Damage, EntityType, Health};
+use crate::entities::data::{AttackTimer, AttackableFrom, Damage, EntityType, Health, Player};
 use crate::entities::event::{EntityDamageEvent, EntityDeathEvent};
 use bevy::app::{App, Plugin, Update};
-use bevy::prelude::{Commands, Entity, EventReader, EventWriter, Query, Res, Time, With};
+use bevy::prelude::{Commands, Entity, EventReader, EventWriter, Query, Res, Time, With, Without};
 use bevy_xpbd_2d::components::CollidingEntities;
 
 pub struct EntityPlugin;
@@ -19,7 +19,7 @@ pub fn deal_damage_on_collision(
     mut attacked_entities: Query<(&CollidingEntities, Entity, &AttackableFrom), With<Health>>,
     time: Res<Time>,
     mut event_writer: EventWriter<EntityDamageEvent>,
-    mut attacking_entities: Query<(&mut AttackTimer, &Damage, &EntityType)>,
+    mut attacking_entities: Query<(&mut AttackTimer, &Damage, &EntityType), Without<Player>>,
 ) {
     for (attacking, damageable_entity, attackable_from) in attacked_entities.iter_mut() {
         for attacking_entity in &attacking.0 {
