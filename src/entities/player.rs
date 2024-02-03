@@ -1,6 +1,6 @@
 use crate::entities::data::{
-    AttackTimer, AttackableFrom, Damage, EntityType, Health, Player, PlayerAttackTimer,
-    MAX_PLAYER_HEALTH, PLAYER_RADIUS, PLAYER_SPEED,
+    AttackableFrom, Damage, EntityType, Health, Player, PlayerAttackTimer, MAX_PLAYER_HEALTH,
+    PLAYER_RADIUS, PLAYER_SPEED,
 };
 use crate::entities::event::{EntityDamageEvent, PlayerMoveEvent};
 use bevy::math::{vec2, vec3};

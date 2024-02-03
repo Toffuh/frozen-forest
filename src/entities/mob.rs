@@ -1,15 +1,11 @@
-use bevy::app::{App, Plugin, Startup, Update};
-use bevy::math::{vec2, Vec2};
-use bevy::prelude::{
-    default, Color, Commands, Query, Sprite, SpriteBundle, Transform, With, Without,
-};
+use bevy::prelude::*;
 
 use crate::entities::data::{
     AttackTimer, AttackableFrom, Damage, EntityType, Health, Mob, Player, MOB_RADIUS, MOB_SPEED,
 };
-use bevy::window::{PrimaryWindow, Window};
-use bevy_xpbd_2d::components::{Collider, LinearDamping, LinearVelocity, LockedAxes, RigidBody};
-use bevy_xpbd_2d::prelude::{ColliderDensity, Restitution};
+use bevy::math::vec2;
+use bevy::window::PrimaryWindow;
+use bevy_xpbd_2d::prelude::*;
 use rand::Rng;
 use std::ops::Mul;
 
