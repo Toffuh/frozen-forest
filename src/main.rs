@@ -15,7 +15,10 @@ pub mod world;
 
 fn main() {
     App::new()
-        .add_plugins((DefaultPlugins, PhysicsPlugins::default()))
+        .add_plugins((
+            DefaultPlugins.set(ImagePlugin::default_nearest()),
+            PhysicsPlugins::default(),
+        ))
         .add_plugins(EntityPlugins)
         .add_plugins(CameraPlugin)
         .add_plugins(WorldPlugin)
