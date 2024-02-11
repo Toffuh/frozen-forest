@@ -7,6 +7,7 @@ use crate::ui::UIPlugin;
 use crate::world::WorldPlugin;
 use bevy::prelude::*;
 use bevy_xpbd_2d::plugins::PhysicsPlugins;
+use bevy_xpbd_2d::prelude::PhysicsLayer;
 
 pub mod camera;
 pub mod entities;
@@ -27,4 +28,13 @@ fn main() {
         // .insert_resource(PhysicsDebugConfig::all())
         .insert_resource(Msaa::default())
         .run();
+}
+
+#[derive(PhysicsLayer)]
+pub enum PhysicsLayers {
+    Player,
+    Mob,
+    Entity,
+    Wall,
+    ClosedTile,
 }

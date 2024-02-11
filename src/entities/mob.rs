@@ -3,6 +3,7 @@ use bevy::prelude::*;
 use crate::entities::data::{
     AttackTimer, AttackableFrom, Damage, EntityType, Health, Mob, Player, MOB_RADIUS, MOB_SPEED,
 };
+use crate::PhysicsLayers;
 use bevy::math::vec2;
 use bevy::window::PrimaryWindow;
 use bevy_xpbd_2d::prelude::*;
@@ -10,6 +11,7 @@ use rand::Rng;
 use std::ops::Mul;
 
 pub struct MobPlugin;
+
 impl Plugin for MobPlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(Update, move_mob)
@@ -38,6 +40,7 @@ pub fn spawn_mobs(mut commands: Commands, window_query: Query<&Window, With<Prim
             RigidBody::Dynamic,
             Restitution::new(0.),
             Collider::ball(MOB_RADIUS),
+            CollisionLayers::all_masks::<PhysicsLayers>().add_group(PhysicsLayers::Wall),
             LinearVelocity(vec2(0., 0.)),
             LinearDamping(20.),
             LockedAxes::ROTATION_LOCKED,
