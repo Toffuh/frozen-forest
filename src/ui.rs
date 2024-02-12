@@ -1,7 +1,6 @@
 use crate::entities::data::{Health, Player, MAX_PLAYER_HEALTH};
 use bevy::app::{App, Startup};
 use bevy::prelude::*;
-use bevy::utils::HashMap;
 
 pub struct UIPlugin;
 
@@ -65,7 +64,6 @@ pub fn update_health_bar(
     heal_bar.width = Val::Percent((health.0 / MAX_PLAYER_HEALTH) as f32 * 100.);
 }
 
-
 #[derive(Component)]
 struct InventorySlot {
     index: usize,
@@ -76,9 +74,7 @@ struct SelectedSlot {
     index: usize,
 }
 
-fn setup(
-    mut commands: Commands,
-) {
+fn setup(mut commands: Commands) {
     let container = NodeBundle {
         style: Style {
             width: Val::Percent(100.),
@@ -92,17 +88,12 @@ fn setup(
         ..Default::default()
     };
 
-    let health_bar_bundle = NodeBundle {
-        background_color: Color::BLACK.into(),
+    let inventory_slot = NodeBundle {
         style: Style {
             width: Val::Px(50.),
             height: Val::Px(50.),
-            margin: UiRect {
-                left: Val::Px(10.),
-                right: Val::Px(10.),
-                bottom: Val::Px(10.),
-                ..Default::default()
-            },
+            border: UiRect::all(Val::Px(5.)),
+            margin: UiRect::all(Val::Px(10.)),
             ..Default::default()
         },
         ..Default::default()
@@ -110,7 +101,9 @@ fn setup(
 
     commands.spawn(container).with_children(|parent| {
         for i in 0..5 {
-            parent.spawn(health_bar_bundle.clone()).insert(InventorySlot { index: i });
+            parent
+                .spawn(inventory_slot.clone())
+                .insert(InventorySlot { index: i + 1});
         }
     });
 
@@ -139,21 +132,14 @@ fn select_inventory_slot(
 }
 
 fn set_border_color(
-    mut query: Query<(&InventorySlot, &mut Style)>,
+    mut query: Query<(&InventorySlot, &mut BorderColor)>,
     selected_slot: Res<SelectedSlot>,
 ) {
-    for (inventory_slot, mut node) in query.iter_mut() {
+    for (inventory_slot, mut background_color) in query.iter_mut() {
         if inventory_slot.index == selected_slot.index {
-            // node.border_color
+            background_color.0 = Color::RED
         } else {
-            // node.background_color = Color::RED.into();
+            background_color.0 = Color::BLACK;
         }
     }
 }
-
-// fn update_border_color(mut selected_slot: ResMut<SelectedSlot>) {
-//     if selected_slot.index.is_some() {
-//         // Clear the selected slot after processing the event
-//         selected_slot.index = None;
-//     }
-// }
