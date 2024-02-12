@@ -7,7 +7,10 @@ pub struct UIPlugin;
 impl Plugin for UIPlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(Startup, setup_health_bar)
-            .add_systems(Update, update_health_bar);
+            .add_systems(Update, update_health_bar)
+            .add_systems(Startup, setup)
+            .add_systems(Update, set_border_color)
+            .add_systems(Update, select_inventory_slot);
     }
 }
 
@@ -59,4 +62,84 @@ pub fn update_health_bar(
     };
 
     heal_bar.width = Val::Percent((health.0 / MAX_PLAYER_HEALTH) as f32 * 100.);
+}
+
+#[derive(Component)]
+struct InventorySlot {
+    index: usize,
+}
+
+#[derive(Resource)]
+struct SelectedSlot {
+    index: usize,
+}
+
+fn setup(mut commands: Commands) {
+    let container = NodeBundle {
+        style: Style {
+            width: Val::Percent(100.),
+            height: Val::Percent(100.),
+            display: Display::Flex,
+            flex_direction: FlexDirection::Row,
+            justify_content: JustifyContent::Center,
+            align_items: AlignItems::End,
+            ..Default::default()
+        },
+        ..Default::default()
+    };
+
+    let inventory_slot = NodeBundle {
+        style: Style {
+            width: Val::Px(50.),
+            height: Val::Px(50.),
+            border: UiRect::all(Val::Px(5.)),
+            margin: UiRect::all(Val::Px(10.)),
+            ..Default::default()
+        },
+        ..Default::default()
+    };
+
+    commands.spawn(container).with_children(|parent| {
+        for i in 0..5 {
+            parent
+                .spawn(inventory_slot.clone())
+                .insert(InventorySlot { index: i + 1});
+        }
+    });
+
+    commands.insert_resource(SelectedSlot { index: 1 });
+}
+
+fn select_inventory_slot(
+    keyboard_input: Res<Input<KeyCode>>,
+    mut selected_slot: ResMut<SelectedSlot>,
+) {
+    if keyboard_input.just_pressed(KeyCode::Key1) {
+        selected_slot.index = 1;
+    }
+    if keyboard_input.just_pressed(KeyCode::Key2) {
+        selected_slot.index = 2;
+    }
+    if keyboard_input.just_pressed(KeyCode::Key3) {
+        selected_slot.index = 3;
+    }
+    if keyboard_input.just_pressed(KeyCode::Key4) {
+        selected_slot.index = 4;
+    }
+    if keyboard_input.just_pressed(KeyCode::Key5) {
+        selected_slot.index = 5;
+    }
+}
+
+fn set_border_color(
+    mut query: Query<(&InventorySlot, &mut BorderColor)>,
+    selected_slot: Res<SelectedSlot>,
+) {
+    for (inventory_slot, mut background_color) in query.iter_mut() {
+        if inventory_slot.index == selected_slot.index {
+            background_color.0 = Color::RED
+        } else {
+            background_color.0 = Color::BLACK;
+        }
+    }
 }
