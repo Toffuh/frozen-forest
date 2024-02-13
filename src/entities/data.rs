@@ -1,6 +1,5 @@
 use bevy::prelude::{Component, Timer, TimerMode};
 
-pub static ATTACK_COOLDOWN: f32 = 1.;
 pub static PLAYER_ATTACK_COOLDOWN: f32 = 0.5;
 
 pub static MOB_SPEED: f32 = 100.;
@@ -35,6 +34,9 @@ pub enum EntityType {
 }
 
 #[derive(Component)]
+pub struct AttackCooldown(f32);
+
+#[derive(Component)]
 pub struct AttackableFrom(pub Vec<EntityType>);
 
 #[derive(Component)]
@@ -42,7 +44,17 @@ pub struct AttackTimer(pub Timer);
 
 impl Default for AttackTimer {
     fn default() -> AttackTimer {
-        AttackTimer(Timer::from_seconds(ATTACK_COOLDOWN, TimerMode::Repeating))
+        AttackTimer(Timer::from_seconds(1., TimerMode::Repeating))
+    }
+}
+
+pub trait AttackTimerInit {
+    fn new_attack_timer(seconds: f32) -> Self;
+}
+
+impl AttackTimerInit for AttackTimer {
+    fn new_attack_timer(seconds: f32) -> Self {
+        AttackTimer(Timer::from_seconds(seconds, TimerMode::Repeating))
     }
 }
 

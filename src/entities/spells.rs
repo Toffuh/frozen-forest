@@ -5,7 +5,7 @@ use bevy::input::Input;
 use bevy::math::{vec2, Vec2Swizzles, vec3, Vec3};
 use bevy::prelude::{Camera, Color, Commands, default, GlobalTransform, MouseButton, Plugin, Query, Res, Sprite, SpriteBundle, Transform, Vec2, Window, With};
 use bevy_xpbd_2d::components::{Collider, CollisionLayers, LinearDamping, LinearVelocity, LockedAxes, Restitution, RigidBody};
-use crate::entities::data::{Damage, EntityType, FIRE_BALL_RADIUS, FIRE_BALL_SPEED, Mob, MOB_SPEED, PLAYER_RADIUS, Fireball, Player};
+use crate::entities::data::{Damage, EntityType, FIRE_BALL_RADIUS, FIRE_BALL_SPEED, Mob, MOB_SPEED, PLAYER_RADIUS, Fireball, Player, AttackTimer, AttackTimerInit};
 use crate::PhysicsLayers;
 
 pub struct SpellPlugin;
@@ -13,7 +13,6 @@ pub struct SpellPlugin;
 impl Plugin for SpellPlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(Update, fire_ball_setup);
-        // .add_systems(Update, fire_ball_move_system);
     }
 }
 
@@ -38,7 +37,6 @@ pub fn fire_ball_setup(
         let world_pos = Vec3::new(world_position.x, world_position.y, 0.);
 
         if let Ok(player_transform) = player_query.get_single() {
-
             let vec = (world_pos - player_transform.translation)
                 .normalize_or_zero()
                 .mul(FIRE_BALL_SPEED);
@@ -48,6 +46,7 @@ pub fn fire_ball_setup(
                 EntityType::Spell,
                 Damage(5.),
                 RigidBody::Dynamic,
+                AttackTimer::new_attack_timer(0.),
                 Restitution::new(0.),
                 Collider::ball(FIRE_BALL_RADIUS),
                 CollisionLayers::all_masks::<PhysicsLayers>().add_group(PhysicsLayers::Spell),

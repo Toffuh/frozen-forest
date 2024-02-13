@@ -1,8 +1,6 @@
 use bevy::prelude::*;
 
-use crate::entities::data::{
-    AttackTimer, AttackableFrom, Damage, EntityType, Health, Mob, Player, MOB_RADIUS, MOB_SPEED,
-};
+use crate::entities::data::{AttackTimer, AttackableFrom, Damage, EntityType, Health, Mob, Player, MOB_RADIUS, MOB_SPEED, AttackTimerInit};
 use crate::PhysicsLayers;
 use bevy::math::vec2;
 use bevy_xpbd_2d::prelude::*;
@@ -24,16 +22,16 @@ pub fn spawn_mobs(mut commands: Commands) {
 
     let mut random = rand::thread_rng();
 
-    for _i in 0..2 {
+    for _i in 0..1 {
         let random_x = random.gen_range(min_x..max_x);
 
         commands.spawn((
             Mob,
             EntityType::Mob,
-            AttackableFrom(vec![EntityType::Player]),
+            AttackableFrom(vec![EntityType::Player, EntityType::Spell]),
             Damage(1.0),
             Health(10.0),
-            AttackTimer::default(),
+            AttackTimer::new_attack_timer(2.),
             RigidBody::Dynamic,
             Restitution::new(0.),
             Collider::ball(MOB_RADIUS),
