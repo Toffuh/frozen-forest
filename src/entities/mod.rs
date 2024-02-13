@@ -4,6 +4,7 @@ use crate::entities::mob::MobPlugin;
 use crate::entities::player::PlayerPlugin;
 use bevy::app::PluginGroupBuilder;
 use bevy::prelude::PluginGroup;
+use crate::entities::spells::SpellPlugin;
 
 pub mod entity;
 pub mod mob;
@@ -12,6 +13,7 @@ pub mod player;
 pub mod data;
 
 pub mod event;
+mod spells;
 
 pub struct EntityPlugins;
 
@@ -22,5 +24,6 @@ impl PluginGroup for EntityPlugins {
             .add(EntityPlugin)
             .add(MobPlugin)
             .add(PlayerPlugin)
+            .add(SpellPlugin)
     }
 }

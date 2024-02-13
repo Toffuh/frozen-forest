@@ -8,6 +8,8 @@ pub static PLAYER_SPEED: f32 = 175.;
 pub static MAX_PLAYER_HEALTH: f64 = 30.;
 pub static PLAYER_RADIUS: f32 = 8.;
 pub static MOB_RADIUS: f32 = 4.;
+pub static FIRE_BALL_RADIUS: f32 = 20.;
+pub static FIRE_BALL_SPEED: f32 = 900.;
 
 #[derive(Component)]
 pub struct Damage(pub f64);
@@ -21,11 +23,15 @@ pub struct Player;
 #[derive(Component)]
 pub struct Mob;
 
+#[derive(Component)]
+pub struct Fireball(pub bool);
+
 #[derive(PartialEq, Component, Debug)]
 pub enum EntityType {
     Player,
     Mob,
     Wall,
+    Spell,
 }
 
 #[derive(Component)]
