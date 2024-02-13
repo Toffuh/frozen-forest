@@ -19,7 +19,12 @@ impl Plugin for WorldPlugin {
                     hover_tile,
                     (
                         highlight_hovered_tiles,
-                        (activate_hovered_tiles, activate_tiles).chain(),
+                        (
+                            activate_hovered_tiles,
+                            activate_tiles,
+                            create_surrounding_tiles,
+                        )
+                            .chain(),
                     ),
                 )
                     .chain(),
@@ -29,8 +34,8 @@ impl Plugin for WorldPlugin {
     }
 }
 
-pub static TILE_SIZE: usize = 300;
-pub static SUB_TILES: usize = 5;
+pub static TILE_SIZE: usize = 750;
+pub static SUB_TILES: usize = 15;
 pub static GROUND_TILE_COUNT: usize = 5;
 
 #[derive(Event)]
@@ -93,9 +98,9 @@ fn setup(mut commands: Commands, tile_assets: Res<TileAssets>) {
         },
     ));
 
-    for x in -5..=5isize {
-        for y in -5..=5isize {
-            if vec2(x as f32, y as f32).length() > 4. {
+    for x in -2..=2isize {
+        for y in -2..=2isize {
+            if x.abs() == 2 || y.abs() == 2 {
                 closed_tile(&mut commands, x, y);
             } else {
                 open_tile(&mut commands, x, y, &tile_assets.forest_tile_map);
@@ -120,7 +125,7 @@ fn open_tile(commands: &mut Commands, x: isize, y: isize, atlas_handle: &Handle<
             },
         ))
         .with_children(|parent| {
-            let sub_tile_size = TILE_SIZE as f32 / 5.;
+            let sub_tile_size = TILE_SIZE as f32 / SUB_TILES as f32;
 
             for x in 0..SUB_TILES {
                 for y in 0..SUB_TILES {
@@ -250,4 +255,40 @@ fn activate_tiles(
                 &tile_assets.forest_tile_map,
             )
         })
+}
+
+fn create_surrounding_tiles(
+    mut commands: Commands,
+    mut activate_tile_event: EventReader<ActivateTileEvent>,
+    tiles: Query<&Transform, With<Tile>>,
+) {
+    let mut filled_positions = tiles
+        .iter()
+        .map(|tile| {
+            (
+                (tile.translation.x / TILE_SIZE as f32) as isize,
+                (tile.translation.y / TILE_SIZE as f32) as isize,
+            )
+        })
+        .collect_vec();
+
+    for event in activate_tile_event.read() {
+        let tile = tiles.get(event.0).unwrap();
+
+        let grid_pos = tile.translation.xy() / TILE_SIZE as f32;
+
+        for x in -1..=1 {
+            for y in -1..=1 {
+                let off_set_pos = (
+                    (grid_pos.x + x as f32) as isize,
+                    (grid_pos.y + y as f32) as isize,
+                );
+
+                if !filled_positions.contains(&off_set_pos) {
+                    filled_positions.push(off_set_pos);
+                    closed_tile(&mut commands, off_set_pos.0, off_set_pos.1)
+                }
+            }
+        }
+    }
 }
