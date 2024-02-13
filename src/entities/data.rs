@@ -23,7 +23,7 @@ pub struct Player;
 pub struct Mob;
 
 #[derive(Component)]
-pub struct Fireball(pub bool);
+pub struct Fireball();
 
 #[derive(PartialEq, Component, Debug)]
 pub enum EntityType {

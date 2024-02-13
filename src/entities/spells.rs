@@ -1,18 +1,19 @@
 use std::ops::Mul;
-use std::slice::Windows;
-use bevy::app::{App, Startup, Update};
+use bevy::app::{App, Update};
 use bevy::input::Input;
-use bevy::math::{vec2, Vec2Swizzles, vec3, Vec3};
-use bevy::prelude::{Camera, Color, Commands, default, GlobalTransform, MouseButton, Plugin, Query, Res, Sprite, SpriteBundle, Transform, Vec2, Window, With};
+use bevy::math::{vec2, vec3, Vec3};
+use bevy::prelude::{Camera, Color, Commands, default, Entity, EventWriter, GlobalTransform, MouseButton, Plugin, Query, Res, Sprite, SpriteBundle, Transform, Vec2, Window, With};
 use bevy_xpbd_2d::components::{Collider, CollisionLayers, LinearDamping, LinearVelocity, LockedAxes, Restitution, RigidBody};
+use bevy_xpbd_2d::prelude::CollidingEntities;
 use crate::entities::data::{Damage, EntityType, FIRE_BALL_RADIUS, FIRE_BALL_SPEED, Mob, MOB_SPEED, PLAYER_RADIUS, Fireball, Player, AttackTimer, AttackTimerInit};
+use crate::entities::event::EntityDeathEvent;
 use crate::PhysicsLayers;
 
 pub struct SpellPlugin;
 
 impl Plugin for SpellPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(Update, fire_ball_setup);
+        app.add_systems(Update, (fire_ball_setup, remove_fireball_on_collision));
     }
 }
 
@@ -42,7 +43,7 @@ pub fn fire_ball_setup(
                 .mul(FIRE_BALL_SPEED);
 
             commands.spawn((
-                Fireball(false),
+                Fireball(),
                 EntityType::Spell,
                 Damage(5.),
                 RigidBody::Dynamic,
@@ -67,64 +68,11 @@ pub fn fire_ball_setup(
     }
 }
 
-// fn mouse_click_spawn_fireball(
-//     mut commands: Commands,
-//     mouse_button_input: Res<Input<MouseButton>>,
-//     windows: Res<Windows>,
-// ) {
-//     if mouse_button_input.just_pressed(MouseButton::Left) {
-//         if let Some(window) = windows.get_primary() {
-//             if let Some(cursor_position) = window.cursor_position() {
-//                 let spawn_position = Vec3::new(cursor_position.x as f32, cursor_position.y as f32, 0.0);
-//                 commands.spawn().insert_bundle(SpriteBundle {
-//                     material: ColorMaterial {
-//                         color: Color::rgb(1., 0.5, 0.),
-//                         texture: None,
-//                     },
-//                     transform: Transform::from_translation(spawn_position),
-//                     ..Default::default()
-//                 })
-//                     .insert(Fireball)
-//                     .insert(RigidBody::Dynamic)
-//                     .insert(LinearVelocity(Vec2::ZERO))
-//                     .insert(Collider::Ball { radius: 10.0 });
-//             }
-//         }
-//     }
-// }
+pub fn remove_fireball_on_collision(
+    mut event_writer: EventWriter<EntityDeathEvent>,
+    colliding_entities: Query<(&CollidingEntities, Entity), With<Fireball>>
+) {
+    for (collding, entity) in colliding_entities.iter() {
 
-// pub fn fire_ball_move_system(
-//     mouse_button_input: Res<Input<MouseButton>>,
-//     windows: Query<&Window>,
-//     camera_query: Query<(&Camera, &GlobalTransform), With<Camera>>,
-//     mut fire_ball_query: Query<(&mut LinearVelocity, &Transform, &mut Fireball)>,
-// ) {
-//     if !mouse_button_input.just_pressed(MouseButton::Left) {
-//         return;
-//     };
-//
-//     for (mut linear_velocity, transform, mut fireball) in fire_ball_query.iter_mut() {
-//         if fireball.0 {
-//             return;
-//         }
-//
-//         fireball.0 = true;
-//
-//         let window = windows.single();
-//         let (camera, camera_transform) = camera_query.single();
-//
-//         if let Some(world_position) = window
-//             .cursor_position()
-//             .and_then(|cursor| camera.viewport_to_world_2d(camera_transform, cursor))
-//         {
-//             let world_pos = Vec3::new(world_position.x, world_position.y, 0.);
-//
-//             let vec = (world_pos - transform.translation)
-//                 .normalize_or_zero()
-//                 .mul(FIRE_BALL_SPEED);
-//
-//             linear_velocity.x = vec.x;
-//             linear_velocity.y = vec.y;
-//         }
-//     }
-// }
+    }
+}
