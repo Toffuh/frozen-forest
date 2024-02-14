@@ -5,9 +5,10 @@ use bevy::math::{vec2, vec3, Vec3};
 use bevy::prelude::{Camera, Color, Commands, default, Entity, EventWriter, GlobalTransform, MouseButton, Plugin, Query, Res, Sprite, SpriteBundle, Transform, Vec2, Window, With};
 use bevy_xpbd_2d::components::{Collider, CollisionLayers, LinearDamping, LinearVelocity, LockedAxes, Restitution, RigidBody};
 use bevy_xpbd_2d::prelude::CollidingEntities;
-use crate::entities::data::{Damage, EntityType, FIRE_BALL_RADIUS, FIRE_BALL_SPEED, Mob, MOB_SPEED, PLAYER_RADIUS, Fireball, Player, AttackTimer, AttackTimerInit};
+use crate::entities::data::{Damage, EntityType, FIRE_BALL_RADIUS, FIRE_BALL_SPEED, Fireball, Player, AttackTimer, AttackTimerInit, FIRE_BALL_DAMAGE};
 use crate::entities::event::EntityDeathEvent;
 use crate::PhysicsLayers;
+use crate::ui::{InventorySlot, SelectedSlot, SpellType};
 
 pub struct SpellPlugin;
 
@@ -23,10 +24,20 @@ pub fn fire_ball_setup(
     camera_query: Query<(&Camera, &GlobalTransform), With<Camera>>,
     mouse_button_input: Res<Input<MouseButton>>,
     player_query: Query<&Transform, With<Player>>,
+    selected_inventory_slot: Res<SelectedSlot>,
+    inventory: Query<&InventorySlot>,
 ) {
     if !mouse_button_input.just_pressed(MouseButton::Left) {
         return;
     };
+
+    for inventory_slot in inventory.iter() {
+        if inventory_slot.spell == SpellType::Fireball {
+            if inventory_slot.index != selected_inventory_slot.index {
+                return;
+            }
+        }
+    }
 
     let window = windows.single();
     let (camera, camera_transform) = camera_query.single();
@@ -45,7 +56,7 @@ pub fn fire_ball_setup(
             commands.spawn((
                 Fireball(),
                 EntityType::Spell,
-                Damage(5.),
+                Damage(FIRE_BALL_DAMAGE.into()),
                 RigidBody::Dynamic,
                 AttackTimer::new_attack_timer(0.),
                 Restitution::new(0.),
@@ -70,7 +81,7 @@ pub fn fire_ball_setup(
 
 pub fn remove_fireball_on_collision(
     mut event_writer: EventWriter<EntityDeathEvent>,
-    colliding_entities: Query<(&CollidingEntities, Entity), With<Fireball>>
+    colliding_entities: Query<(&CollidingEntities, Entity), With<Fireball>>,
 ) {
     for (collding, entity) in colliding_entities.iter() {
         if collding.0.len() != 0 {

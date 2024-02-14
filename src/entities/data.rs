@@ -9,6 +9,7 @@ pub static PLAYER_RADIUS: f32 = 8.;
 pub static MOB_RADIUS: f32 = 4.;
 pub static FIRE_BALL_RADIUS: f32 = 20.;
 pub static FIRE_BALL_SPEED: f32 = 900.;
+pub static FIRE_BALL_DAMAGE: f32 = 4.;
 
 #[derive(Component)]
 pub struct Damage(pub f64);

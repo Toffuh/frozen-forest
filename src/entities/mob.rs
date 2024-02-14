@@ -22,7 +22,7 @@ pub fn spawn_mobs(mut commands: Commands) {
 
     let mut random = rand::thread_rng();
 
-    for _i in 0..1 {
+    for _i in 0..10 {
         let random_x = random.gen_range(min_x..max_x);
 
         commands.spawn((

@@ -64,14 +64,21 @@ pub fn update_health_bar(
     heal_bar.width = Val::Percent((health.0 / MAX_PLAYER_HEALTH) as f32 * 100.);
 }
 
+#[derive(PartialEq, Component, Debug)]
+pub enum SpellType {
+    Fireball,
+    None,
+}
+
 #[derive(Component)]
-struct InventorySlot {
-    index: usize,
+pub struct InventorySlot {
+    pub index: usize,
+    pub spell: SpellType,
 }
 
 #[derive(Resource)]
-struct SelectedSlot {
-    index: usize,
+pub struct SelectedSlot {
+    pub index: usize,
 }
 
 fn setup(mut commands: Commands) {
@@ -100,10 +107,14 @@ fn setup(mut commands: Commands) {
     };
 
     commands.spawn(container).with_children(|parent| {
-        for i in 0..5 {
+        parent
+            .spawn(inventory_slot.clone())
+            .insert(InventorySlot { index: 1, spell: SpellType::Fireball });
+
+        for i in 1..5 {
             parent
                 .spawn(inventory_slot.clone())
-                .insert(InventorySlot { index: i + 1 });
+                .insert(InventorySlot { index: i + 1, spell: SpellType::None });
         }
     });
 
