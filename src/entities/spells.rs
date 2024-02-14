@@ -73,6 +73,8 @@ pub fn remove_fireball_on_collision(
     colliding_entities: Query<(&CollidingEntities, Entity), With<Fireball>>
 ) {
     for (collding, entity) in colliding_entities.iter() {
-
+        if collding.0.len() != 0 {
+            event_writer.send(EntityDeathEvent(entity));
+        }
     }
 }
