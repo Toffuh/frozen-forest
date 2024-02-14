@@ -55,3 +55,12 @@ impl DamageCoolDown {
         DamageCoolDown(Timer::from_seconds(seconds, TimerMode::Once))
     }
 }
+
+#[derive(Component)]
+pub struct DespawnTimer(pub Timer);
+
+impl DespawnTimer {
+    pub fn from_seconds(seconds: f32) -> Self {
+        DespawnTimer(Timer::from_seconds(seconds, TimerMode::Once))
+    }
+}
