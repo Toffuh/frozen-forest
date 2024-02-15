@@ -103,7 +103,7 @@ fn setup(mut commands: Commands) {
         for i in 0..5 {
             parent
                 .spawn(inventory_slot.clone())
-                .insert(InventorySlot { index: i + 1});
+                .insert(InventorySlot { index: i + 1 });
         }
     });
 

@@ -5,7 +5,6 @@ use crate::entities::data::{
 };
 use crate::PhysicsLayers;
 use bevy::math::vec2;
-use bevy::window::PrimaryWindow;
 use bevy_xpbd_2d::prelude::*;
 use rand::Rng;
 use std::ops::Mul;
@@ -19,11 +18,9 @@ impl Plugin for MobPlugin {
     }
 }
 
-pub fn spawn_mobs(mut commands: Commands, window_query: Query<&Window, With<PrimaryWindow>>) {
-    let window = window_query.get_single().unwrap();
-
-    let min_x = -(window.width() / 2.);
-    let max_x = window.width() / 2.;
+pub fn spawn_mobs(mut commands: Commands) {
+    let min_x = -300.;
+    let max_x = 300.;
 
     let mut random = rand::thread_rng();
 
@@ -51,7 +48,7 @@ pub fn spawn_mobs(mut commands: Commands, window_query: Query<&Window, With<Prim
                     custom_size: Some(Vec2::new(MOB_RADIUS * 2., MOB_RADIUS * 2.)),
                     ..default()
                 },
-                transform: Transform::from_xyz(random_x, -window.height() / 2. + 50., 0.),
+                transform: Transform::from_xyz(random_x, -300., 0.),
                 ..default()
             },
         ));

@@ -3,11 +3,11 @@ use crate::entities::data::{
     PLAYER_RADIUS, PLAYER_SPEED,
 };
 use crate::entities::event::{EntityDamageEvent, PlayerMoveEvent};
+use crate::PhysicsLayers;
 use bevy::math::{vec2, vec3};
 use bevy::prelude::*;
 use bevy_xpbd_2d::prelude::*;
 use std::ops::Mul;
-use crate::PhysicsLayers;
 
 pub struct PlayerPlugin;
 
@@ -31,7 +31,8 @@ pub fn player_setup(mut commands: Commands) {
         RigidBody::Dynamic,
         Restitution::new(0.),
         Collider::ball(PLAYER_RADIUS),
-        CollisionLayers::all_masks::<PhysicsLayers>().add_groups([PhysicsLayers::Player,PhysicsLayers::Entity]),
+        CollisionLayers::all_masks::<PhysicsLayers>()
+            .add_groups([PhysicsLayers::Player, PhysicsLayers::Entity]),
         LinearVelocity(vec2(0., 0.)),
         LinearDamping(20.),
         LockedAxes::ROTATION_LOCKED,
