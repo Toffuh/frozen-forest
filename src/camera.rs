@@ -15,7 +15,15 @@ impl Plugin for CameraPlugin {
 
 pub fn setup(mut commands: Commands) {
     commands.spawn((
-        Camera2dBundle::default(),
+        Camera2dBundle {
+            projection: OrthographicProjection {
+                scale: 0.4,
+                far: 1000.,
+                near: -1000.,
+                ..default()
+            },
+            ..default()
+        },
         RigidBody::Kinematic,
         LinearVelocity::ZERO,
     ));

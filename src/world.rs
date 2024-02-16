@@ -34,9 +34,9 @@ impl Plugin for WorldPlugin {
     }
 }
 
-pub static TILE_SIZE: usize = 750;
-pub static SUB_TILES: usize = 15;
-pub static GROUND_TILE_COUNT: usize = 5;
+pub static SUB_TILES: f32 = 15.;
+pub static TILE_SIZE: f32 = SUB_TILES * 16.;
+pub static GROUND_SPRITE_COUNT: usize = 5;
 
 #[derive(Event)]
 pub struct HoverTileEvent(Entity);
@@ -64,7 +64,7 @@ fn load_assets(
     let texture_atlas = TextureAtlas::from_grid(
         texture_handle,
         vec2(16., 16.),
-        GROUND_TILE_COUNT,
+        GROUND_SPRITE_COUNT,
         1,
         None,
         None,
@@ -117,26 +117,26 @@ fn open_tile(commands: &mut Commands, x: isize, y: isize, atlas_handle: &Handle<
             Tile,
             SpatialBundle {
                 transform: Transform::from_translation(Vec3::new(
-                    x as f32 * TILE_SIZE as f32,
-                    y as f32 * TILE_SIZE as f32,
+                    x as f32 * TILE_SIZE,
+                    y as f32 * TILE_SIZE,
                     -5.,
                 )),
                 ..default()
             },
         ))
         .with_children(|parent| {
-            let sub_tile_size = TILE_SIZE as f32 / SUB_TILES as f32;
+            let sub_tile_size = TILE_SIZE / SUB_TILES;
 
-            for x in 0..SUB_TILES {
-                for y in 0..SUB_TILES {
+            for x in 0..SUB_TILES as i32 {
+                for y in 0..SUB_TILES as i32 {
                     //offset so 0/0 is in the center of the tile
-                    let x = x as f32 - SUB_TILES as f32 / 2.;
-                    let y = y as f32 - SUB_TILES as f32 / 2.;
+                    let x = x as f32 - SUB_TILES / 2.;
+                    let y = y as f32 - SUB_TILES / 2.;
 
                     parent.spawn(SpriteSheetBundle {
                         texture_atlas: atlas_handle.clone(),
                         sprite: TextureAtlasSprite {
-                            index: rng.gen_range(0..GROUND_TILE_COUNT),
+                            index: rng.gen_range(0..GROUND_SPRITE_COUNT),
                             custom_size: Some(vec2(sub_tile_size, sub_tile_size)),
                             anchor: Anchor::BottomLeft,
                             ..default()
@@ -160,18 +160,18 @@ fn closed_tile(commands: &mut Commands, x: isize, y: isize) {
         SpriteBundle {
             sprite: Sprite {
                 color: Color::rgb(1.0, 0.2, 0.1),
-                custom_size: Some(vec2(TILE_SIZE as f32, TILE_SIZE as f32)),
+                custom_size: Some(vec2(TILE_SIZE, TILE_SIZE)),
                 ..default()
             },
             transform: Transform::from_translation(Vec3::new(
-                x as f32 * TILE_SIZE as f32,
-                y as f32 * TILE_SIZE as f32,
+                x as f32 * TILE_SIZE,
+                y as f32 * TILE_SIZE,
                 -5.,
             )),
             ..default()
         },
         RigidBody::Static,
-        Collider::cuboid(TILE_SIZE as f32, TILE_SIZE as f32),
+        Collider::cuboid(TILE_SIZE, TILE_SIZE),
         CollisionLayers::all_masks::<PhysicsLayers>().add_group(PhysicsLayers::ClosedTile),
         Restitution::new(0.),
     ));
@@ -245,7 +245,7 @@ fn activate_tiles(
                 .get(tile)
                 .expect("tried to delete Tile without transform");
 
-            let grid_pos = transform.translation.xy() / TILE_SIZE as f32;
+            let grid_pos = transform.translation.xy() / TILE_SIZE;
 
             commands.entity(tile).despawn();
             open_tile(
@@ -266,8 +266,8 @@ fn create_surrounding_tiles(
         .iter()
         .map(|tile| {
             (
-                (tile.translation.x / TILE_SIZE as f32) as isize,
-                (tile.translation.y / TILE_SIZE as f32) as isize,
+                (tile.translation.x / TILE_SIZE) as isize,
+                (tile.translation.y / TILE_SIZE) as isize,
             )
         })
         .collect_vec();
@@ -275,7 +275,7 @@ fn create_surrounding_tiles(
     for event in activate_tile_event.read() {
         let tile = tiles.get(event.0).unwrap();
 
-        let grid_pos = tile.translation.xy() / TILE_SIZE as f32;
+        let grid_pos = tile.translation.xy() / TILE_SIZE;
 
         for x in -1..=1 {
             for y in -1..=1 {
