@@ -1,6 +1,8 @@
 use bevy::prelude::*;
 
-use crate::entities::data::{AttackTimer, AttackableFrom, Damage, EntityType, Health, Mob, Player, MOB_RADIUS, MOB_SPEED, AttackTimerInit};
+use crate::entities::data::{
+    AttackTimer, AttackableFrom, Damage, EntityType, Health, Mob, Player, MOB_RADIUS, MOB_SPEED,
+};
 use crate::PhysicsLayers;
 use bevy::math::vec2;
 use bevy_xpbd_2d::prelude::*;

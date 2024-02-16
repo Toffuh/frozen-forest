@@ -49,12 +49,8 @@ impl Default for AttackTimer {
     }
 }
 
-pub trait AttackTimerInit {
-    fn new_attack_timer(seconds: f32) -> Self;
-}
-
-impl AttackTimerInit for AttackTimer {
-    fn new_attack_timer(seconds: f32) -> Self {
+impl AttackTimer {
+    pub(crate) fn new_attack_timer(seconds: f32) -> Self {
         AttackTimer(Timer::from_seconds(seconds, TimerMode::Repeating))
     }
 }

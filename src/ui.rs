@@ -67,13 +67,12 @@ pub fn update_health_bar(
 #[derive(PartialEq, Component, Debug)]
 pub enum SpellType {
     Fireball,
-    None,
 }
 
 #[derive(Component)]
 pub struct InventorySlot {
     pub index: usize,
-    pub spell: SpellType,
+    pub spell: Option<SpellType>,
 }
 
 #[derive(Resource)]
@@ -107,14 +106,21 @@ fn setup(mut commands: Commands) {
     };
 
     commands.spawn(container).with_children(|parent| {
-        parent
-            .spawn(inventory_slot.clone())
-            .insert(InventorySlot { index: 1, spell: SpellType::Fireball });
+        parent.spawn(inventory_slot.clone()).insert(InventorySlot {
+            index: 1,
+            spell: None,
+        });
 
-        for i in 1..5 {
-            parent
-                .spawn(inventory_slot.clone())
-                .insert(InventorySlot { index: i + 1, spell: SpellType::None });
+        parent.spawn(inventory_slot.clone()).insert(InventorySlot {
+            index: 2,
+            spell: Some(SpellType::Fireball),
+        });
+
+        for i in 2..5 {
+            parent.spawn(inventory_slot.clone()).insert(InventorySlot {
+                index: i + 1,
+                spell: None,
+            });
         }
     });
 

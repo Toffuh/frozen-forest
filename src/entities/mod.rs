@@ -2,9 +2,9 @@ use crate::entities::entity::EntityPlugin;
 use crate::entities::event::EventPlugin;
 use crate::entities::mob::MobPlugin;
 use crate::entities::player::PlayerPlugin;
+use crate::entities::spells::SpellPlugin;
 use bevy::app::PluginGroupBuilder;
 use bevy::prelude::PluginGroup;
-use crate::entities::spells::SpellPlugin;
 
 pub mod entity;
 pub mod mob;

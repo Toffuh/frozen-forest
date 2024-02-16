@@ -18,15 +18,15 @@ impl Plugin for EntityPlugin {
             Update,
             (deal_damage_on_collision, deal_damage, remove_dead_entities),
         )
-        .add_systems(
-            Update,
-            (
-                tick_damage_cool_down,
-                remove_damage_cool_down,
-                color_mob_on_damage,
-                despawn,
-            ),
-        );
+            .add_systems(
+                Update,
+                (
+                    tick_damage_cool_down,
+                    remove_damage_cool_down,
+                    color_mob_on_damage,
+                    despawn,
+                ),
+            );
     }
 }
 
