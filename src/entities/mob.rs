@@ -40,7 +40,8 @@ pub fn spawn_mobs(mut commands: Commands, window_query: Query<&Window, With<Prim
             RigidBody::Dynamic,
             Restitution::new(0.),
             Collider::ball(MOB_RADIUS),
-            CollisionLayers::all_masks::<PhysicsLayers>().add_group(PhysicsLayers::Wall),
+            CollisionLayers::all_masks::<PhysicsLayers>()
+                .add_groups([PhysicsLayers::Mob, PhysicsLayers::Entity]),
             LinearVelocity(vec2(0., 0.)),
             LinearDamping(20.),
             LockedAxes::ROTATION_LOCKED,

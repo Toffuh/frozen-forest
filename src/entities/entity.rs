@@ -1,5 +1,6 @@
 use crate::entities::data::{
-    AttackTimer, AttackableFrom, Damage, DamageCoolDown, EntityType, Health, Mob, Player,
+    AttackTimer, AttackableFrom, Damage, DamageCoolDown, DespawnTimer, EntityType, Health, Mob,
+    Player,
 };
 use crate::entities::event::{EntityDamageEvent, EntityDeathEvent};
 use bevy::app::{App, Plugin, Update};
@@ -23,6 +24,7 @@ impl Plugin for EntityPlugin {
                 tick_damage_cool_down,
                 remove_damage_cool_down,
                 color_mob_on_damage,
+                despawn,
             ),
         );
     }
@@ -118,6 +120,20 @@ pub fn color_mob_on_damage(
             sprite.color = Color::rgb(1., 0.75, 0.25)
         } else {
             sprite.color = Color::rgb(0.25, 0.75, 0.25)
+        }
+    }
+}
+
+pub fn despawn(
+    mut commands: Commands,
+    time: Res<Time>,
+    mut mobs: Query<(Entity, &mut DespawnTimer)>,
+) {
+    for (entity, mut timer) in mobs.iter_mut() {
+        timer.0.tick(time.delta());
+
+        if timer.0.just_finished() {
+            commands.entity(entity).despawn()
         }
     }
 }
