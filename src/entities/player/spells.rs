@@ -3,19 +3,21 @@ use crate::entities::data::{
     FIRE_BALL_SPEED,
 };
 use crate::entities::event::EntityDeathEvent;
-use crate::ui::{InventorySlot, SelectedSlot, SpellType};
+use crate::entities::player::attacks::PlayerAttackEvent;
+use crate::ui::{InventorySlot, SelectedSlot, AttackType};
 use crate::PhysicsLayers;
 use bevy::app::{App, Update};
 use bevy::input::Input;
 use bevy::math::{vec2, vec3};
 use bevy::prelude::{
-    default, Camera, Color, Commands, Entity, EventWriter, GlobalTransform, MouseButton, Plugin,
-    Query, Res, Sprite, SpriteBundle, Transform, Vec2, Window, With,
+    default, Camera, Color, Commands, Entity, EventReader, EventWriter, GlobalTransform,
+    MouseButton, Plugin, Query, Res, Sprite, SpriteBundle, Transform, Vec2, Window, With,
 };
 use bevy_xpbd_2d::components::{
     Collider, CollisionLayers, LinearDamping, LinearVelocity, LockedAxes, Restitution, RigidBody,
 };
 use bevy_xpbd_2d::prelude::CollidingEntities;
+use iter_tools::Itertools;
 
 pub struct SpellPlugin;
 
@@ -29,22 +31,17 @@ pub fn spawn_fire_ball(
     mut commands: Commands,
     windows: Query<&Window>,
     camera_query: Query<(&Camera, &GlobalTransform), With<Camera>>,
-    mouse_button_input: Res<Input<MouseButton>>,
     player_query: Query<&Transform, With<Player>>,
-    selected_inventory_slot: Res<SelectedSlot>,
-    inventory: Query<&InventorySlot>,
+    mut attack_event: EventReader<PlayerAttackEvent>,
 ) {
-    if !mouse_button_input.just_pressed(MouseButton::Left) {
+    if !attack_event
+        .read()
+        .contains(&PlayerAttackEvent(AttackType::Fireball))
+    {
         return;
-    };
-
-    for inventory_slot in inventory.iter() {
-        if inventory_slot.spell == Some(SpellType::Fireball)
-            && inventory_slot.index != selected_inventory_slot.index
-        {
-            return;
-        }
     }
+
+    attack_event.clear();
 
     let window = windows.single();
     let (camera, camera_transform) = camera_query.single();
