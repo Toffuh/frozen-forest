@@ -6,7 +6,7 @@ use crate::entities::EntityPlugins;
 use crate::ui::UIPlugin;
 use crate::world::WorldPlugin;
 use bevy::prelude::*;
-use bevy_xpbd_2d::plugins::PhysicsPlugins;
+use bevy_xpbd_2d::plugins::{PhysicsDebugPlugin, PhysicsPlugins};
 use bevy_xpbd_2d::prelude::PhysicsLayer;
 
 pub mod camera;
@@ -19,6 +19,7 @@ fn main() {
         .add_plugins((
             DefaultPlugins.set(ImagePlugin::default_nearest()),
             PhysicsPlugins::default(),
+            PhysicsDebugPlugin::default(),
         ))
         .add_plugins(EntityPlugins)
         .add_plugins(CameraPlugin)
