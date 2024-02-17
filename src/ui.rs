@@ -1,5 +1,6 @@
 use crate::entities::data::{Health, Player, MAX_PLAYER_HEALTH};
 use bevy::app::{App, Startup};
+use bevy::input::mouse::MouseWheel;
 use bevy::prelude::*;
 
 pub struct UIPlugin;
@@ -10,7 +11,10 @@ impl Plugin for UIPlugin {
             .add_systems(Update, update_health_bar)
             .add_systems(Startup, setup)
             .add_systems(Update, set_border_color)
-            .add_systems(Update, select_inventory_slot);
+            .add_systems(
+                Update,
+                (select_inventory_slot_keyboard, select_inventory_slot_wheel),
+            );
     }
 }
 
@@ -107,44 +111,59 @@ fn setup(mut commands: Commands) {
 
     commands.spawn(container).with_children(|parent| {
         parent.spawn(inventory_slot.clone()).insert(InventorySlot {
-            index: 1,
+            index: 0,
             spell: None,
         });
 
         parent.spawn(inventory_slot.clone()).insert(InventorySlot {
-            index: 2,
+            index: 1,
             spell: Some(SpellType::Fireball),
         });
 
         for i in 2..5 {
             parent.spawn(inventory_slot.clone()).insert(InventorySlot {
-                index: i + 1,
+                index: i,
                 spell: None,
             });
         }
     });
 
-    commands.insert_resource(SelectedSlot { index: 1 });
+    commands.insert_resource(SelectedSlot { index: 0 });
 }
 
-fn select_inventory_slot(
+fn select_inventory_slot_keyboard(
     keyboard_input: Res<Input<KeyCode>>,
     mut selected_slot: ResMut<SelectedSlot>,
 ) {
     if keyboard_input.just_pressed(KeyCode::Key1) {
-        selected_slot.index = 1;
+        selected_slot.index = 0;
     }
     if keyboard_input.just_pressed(KeyCode::Key2) {
-        selected_slot.index = 2;
+        selected_slot.index = 1;
     }
     if keyboard_input.just_pressed(KeyCode::Key3) {
-        selected_slot.index = 3;
+        selected_slot.index = 2;
     }
     if keyboard_input.just_pressed(KeyCode::Key4) {
-        selected_slot.index = 4;
+        selected_slot.index = 3;
     }
     if keyboard_input.just_pressed(KeyCode::Key5) {
-        selected_slot.index = 5;
+        selected_slot.index = 4;
+    }
+}
+
+fn select_inventory_slot_wheel(
+    mut scroll_event: EventReader<MouseWheel>,
+    mut selected_slot: ResMut<SelectedSlot>,
+) {
+    for event in scroll_event.read() {
+        if event.y > 0. {
+            selected_slot.index += 1;
+            selected_slot.index %= 5;
+        } else {
+            selected_slot.index += 4;
+            selected_slot.index %= 5;
+        }
     }
 }
 
