@@ -92,8 +92,10 @@ pub fn remove_dead_entities(
     mut event_reader: EventReader<EntityDeathEvent>,
     mut commands: Commands,
 ) {
-    for dead_entity in event_reader.read() {
-        commands.entity(dead_entity.0).despawn();
+    for dead_entity in event_reader.read().dedup() {
+       if let Some(mut entity) =  commands.get_entity(dead_entity.0){
+           entity.despawn()
+       }
     }
 }
 

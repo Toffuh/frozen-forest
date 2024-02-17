@@ -24,16 +24,16 @@ pub fn spawn_mobs(mut commands: Commands) {
 
     let mut random = rand::thread_rng();
 
-    for _i in 0..2 {
+    for _i in 0..10 {
         let random_x = random.gen_range(min_x..max_x);
 
         commands.spawn((
             Mob,
             EntityType::Mob,
-            AttackableFrom(vec![EntityType::Player]),
+            AttackableFrom(vec![EntityType::Player, EntityType::Spell]),
             Damage(1.0),
             Health(10.0),
-            AttackTimer::default(),
+            AttackTimer::new_attack_timer(2.),
             RigidBody::Dynamic,
             Restitution::new(0.),
             Collider::ball(MOB_RADIUS),
