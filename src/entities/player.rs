@@ -85,7 +85,7 @@ pub fn player_attack_system(
 
         let dir = (world_pos - player_pos).normalize_or_zero();
 
-        let collider_pos = (dir * (PLAYER_RADIUS + 30.)).xy() + player_pos;
+        let collider_pos = (dir * (PLAYER_RADIUS * 2.)).xy() + player_pos;
 
         commands.spawn((
             PlayerAttack {
@@ -95,16 +95,16 @@ pub fn player_attack_system(
             SpriteBundle {
                 sprite: Sprite {
                     color: Color::rgb(0.7, 0.25, 0.2),
-                    custom_size: Some(vec2(30., 70.)),
+                    custom_size: Some(vec2(12., 30.)),
                     ..default()
                 },
                 transform: Transform::from_xyz(collider_pos.x, collider_pos.y, 0.),
                 ..default()
             },
-            DespawnTimer::from_seconds(0.1),
+            DespawnTimer::from_seconds(0.2),
             Sensor,
             CollisionLayers::new([PhysicsLayers::Player], [PhysicsLayers::Mob]),
-            Collider::capsule(40., 15.),
+            Collider::capsule(18., 6.),
             RigidBody::Static,
         ));
 
