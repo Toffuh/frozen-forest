@@ -4,14 +4,14 @@ use crate::entities::data::{
 };
 use crate::entities::event::EntityDeathEvent;
 use crate::entities::player::attacks::PlayerAttackEvent;
-use crate::ui::{InventorySlot, SelectedSlot, AttackType};
+use crate::ui::AttackType;
 use crate::PhysicsLayers;
 use bevy::app::{App, Update};
-use bevy::input::Input;
+
 use bevy::math::{vec2, vec3};
 use bevy::prelude::{
-    default, Camera, Color, Commands, Entity, EventReader, EventWriter, GlobalTransform,
-    MouseButton, Plugin, Query, Res, Sprite, SpriteBundle, Transform, Vec2, Window, With,
+    default, Camera, Color, Commands, Entity, EventReader, EventWriter, GlobalTransform, Plugin,
+    Query, Sprite, SpriteBundle, Transform, Vec2, Window, With,
 };
 use bevy_xpbd_2d::components::{
     Collider, CollisionLayers, LinearDamping, LinearVelocity, LockedAxes, Restitution, RigidBody,

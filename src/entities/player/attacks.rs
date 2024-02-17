@@ -1,13 +1,10 @@
-use crate::entities::data::{
-    AttackableFrom, Damage, DespawnTimer, EntityType, Player, PlayerAttackCoolDown, PLAYER_RADIUS,
-};
-use crate::entities::event::EntityDamageEvent;
-use crate::entities::player::{handle_keyboard_input, move_player, player_setup, PlayerPlugin};
+use crate::entities::data::{Player, PlayerAttackCoolDown};
+
 use crate::ui::{AttackType, InventorySlot, SelectedSlot};
-use crate::PhysicsLayers;
-use bevy::app::{App, Plugin, Startup, Update};
+
+use bevy::app::{App, Plugin, Update};
 use bevy::input::Input;
-use bevy::math::{vec2, Vec2, Vec2Swizzles, Vec3Swizzles};
+
 use bevy::prelude::*;
 
 pub struct AttackPlugin;
@@ -38,17 +35,15 @@ fn player_attack(
         return;
     }
 
-    let attack_type = &inventory
+    if let Some(slot) = &inventory
         .iter()
         .find(|slot| slot.index == selected_inventory_slot.index)
-        .expect(&*format!(
-            "Invalid slot selected {}",
-            selected_inventory_slot.index
-        ))
-        .attack;
-
-    if let Some(attack_type) = attack_type {
-        attack_event.send(PlayerAttackEvent(*attack_type));
-        attack_timer.0.reset();
+    {
+        if let Some(attack_type) = slot.attack {
+            attack_event.send(PlayerAttackEvent(attack_type));
+            attack_timer.0.reset();
+        }
+    } else {
+        error!("Invalid slot selected {}", selected_inventory_slot.index)
     }
 }

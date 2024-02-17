@@ -1,13 +1,13 @@
 use crate::entities::data::{
-    AttackableFrom, Damage, DespawnTimer, EntityType, Player, PlayerAttackCoolDown, PLAYER_RADIUS,
+    AttackableFrom, Damage, DespawnTimer, EntityType, Player, PLAYER_RADIUS,
 };
 use crate::entities::event::EntityDamageEvent;
 use crate::entities::player::attacks::PlayerAttackEvent;
-use crate::entities::player::{handle_keyboard_input, move_player, player_setup, PlayerPlugin};
+
 use crate::ui::AttackType;
 use crate::PhysicsLayers;
-use bevy::app::{App, Plugin, Startup, Update};
-use bevy::input::Input;
+use bevy::app::{App, Plugin, Update};
+
 use bevy::math::{vec2, Vec2};
 use bevy::prelude::*;
 use bevy_xpbd_2d::components::{

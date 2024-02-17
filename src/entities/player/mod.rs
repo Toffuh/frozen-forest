@@ -1,8 +1,8 @@
 use crate::entities::data::{
-    AttackableFrom, Damage, DespawnTimer, EntityType, Health, Player, PlayerAttackCoolDown,
-    MAX_PLAYER_HEALTH, PLAYER_RADIUS, PLAYER_SPEED,
+    AttackableFrom, Damage, EntityType, Health, Player, PlayerAttackCoolDown, MAX_PLAYER_HEALTH,
+    PLAYER_RADIUS, PLAYER_SPEED,
 };
-use crate::entities::event::{EntityDamageEvent, PlayerMoveEvent};
+use crate::entities::event::PlayerMoveEvent;
 use crate::PhysicsLayers;
 use bevy::math::{vec2, vec3};
 use bevy::prelude::*;
