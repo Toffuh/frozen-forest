@@ -18,7 +18,7 @@ pub struct EntityDamageEvent {
     pub damage: f64,
 }
 
-#[derive(Event)]
+#[derive(Event, PartialEq)]
 pub struct EntityDeathEvent(pub Entity);
 
 #[derive(Event)]

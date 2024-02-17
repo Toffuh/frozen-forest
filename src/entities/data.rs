@@ -50,7 +50,7 @@ impl Default for AttackTimer {
 }
 
 impl AttackTimer {
-    pub(crate) fn new_attack_timer(seconds: f32) -> Self {
+    pub fn new_attack_timer(seconds: f32) -> Self {
         AttackTimer(Timer::from_seconds(seconds, TimerMode::Repeating))
     }
 }
