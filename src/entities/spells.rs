@@ -67,7 +67,7 @@ pub fn spawn_fire_ball(
             commands.spawn((
                 Fireball(),
                 EntityType::Spell,
-                Damage(FIRE_BALL_DAMAGE.into()),
+                Damage(FIRE_BALL_DAMAGE as f64),
                 RigidBody::Dynamic,
                 AttackTimer::new_attack_timer(0.),
                 Restitution::new(0.),

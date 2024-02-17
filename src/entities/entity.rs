@@ -18,15 +18,15 @@ impl Plugin for EntityPlugin {
             Update,
             (deal_damage_on_collision, deal_damage, remove_dead_entities),
         )
-            .add_systems(
-                Update,
-                (
-                    tick_damage_cool_down,
-                    remove_damage_cool_down,
-                    color_mob_on_damage,
-                    despawn,
-                ),
-            );
+        .add_systems(
+            Update,
+            (
+                tick_damage_cool_down,
+                remove_damage_cool_down,
+                color_mob_on_damage,
+                despawn,
+            ),
+        );
     }
 }
 
@@ -93,7 +93,9 @@ pub fn remove_dead_entities(
     mut commands: Commands,
 ) {
     for dead_entity in event_reader.read().dedup() {
-        commands.entity(dead_entity.0).despawn();
+       if let Some(mut entity) =  commands.get_entity(dead_entity.0){
+           entity.despawn()
+       }
     }
 }
 
