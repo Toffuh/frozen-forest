@@ -36,7 +36,7 @@ impl Plugin for WorldPlugin {
 
 pub static SUB_TILES: f32 = 15.;
 pub static TILE_SIZE: f32 = SUB_TILES * 16.;
-pub static GROUND_SPRITE_COUNT: usize = 5;
+pub static GROUND_SPRITE_COUNT: usize = 9;
 
 #[derive(Event)]
 pub struct HoverTileEvent(Entity);
