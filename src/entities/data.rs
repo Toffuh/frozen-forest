@@ -56,11 +56,11 @@ impl AttackTimer {
 }
 
 #[derive(Component)]
-pub struct PlayerAttackTimer(pub Timer);
+pub struct PlayerAttackCoolDown(pub Timer);
 
-impl Default for PlayerAttackTimer {
-    fn default() -> PlayerAttackTimer {
-        PlayerAttackTimer(Timer::from_seconds(PLAYER_ATTACK_COOLDOWN, TimerMode::Once))
+impl Default for PlayerAttackCoolDown {
+    fn default() -> PlayerAttackCoolDown {
+        PlayerAttackCoolDown(Timer::from_seconds(PLAYER_ATTACK_COOLDOWN, TimerMode::Once))
     }
 }
 
