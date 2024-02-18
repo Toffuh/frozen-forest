@@ -91,7 +91,6 @@ pub fn spawn_fire_ball(
 pub fn remove_fireball_on_collision(
     mut event_writer: EventWriter<EntityDeathEvent>,
     colliding_entities: Query<(&CollidingEntities, Entity), With<Fireball>>,
-    player: Query<Entity, With<Player>>
 ) {
     for (collding, entity) in colliding_entities.iter() {
         if !collding.0.is_empty()  {
