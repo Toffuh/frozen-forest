@@ -3,10 +3,14 @@ use bevy::prelude::{Component, Timer, TimerMode};
 pub static PLAYER_ATTACK_COOLDOWN: f32 = 0.5;
 
 pub static MOB_SPEED: f32 = 100.;
-pub static PLAYER_SPEED: f32 = 175.;
-pub static MAX_PLAYER_HEALTH: f64 = 30.;
-pub static PLAYER_RADIUS: f32 = 8.;
 pub static MOB_RADIUS: f32 = 4.;
+pub static MOB_HEALTH: f32 = 10.;
+pub static MOB_DAMAGE: f32 = 4.;
+
+pub static PLAYER_SPEED: f32 = 175.;
+pub static PLAYER_RADIUS: f32 = 8.;
+pub static MAX_PLAYER_HEALTH: f64 = 30.;
+
 pub static FIRE_BALL_RADIUS: f32 = 6.;
 pub static FIRE_BALL_SPEED: f32 = 300.;
 pub static FIRE_BALL_DAMAGE: f32 = 4.;

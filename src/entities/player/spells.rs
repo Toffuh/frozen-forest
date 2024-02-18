@@ -1,18 +1,12 @@
-use crate::entities::data::{
-    AttackTimer, Damage, EntityType, Fireball, Player, FIRE_BALL_DAMAGE, FIRE_BALL_RADIUS,
-    FIRE_BALL_SPEED,
-};
-use crate::entities::event::EntityDeathEvent;
+use crate::entities::data::{AttackTimer, Damage, EntityType, Fireball, Player, FIRE_BALL_DAMAGE, FIRE_BALL_RADIUS, FIRE_BALL_SPEED, AttackableFrom, MOB_HEALTH};
+use crate::entities::event::{EntityDamageEvent, EntityDeathEvent, FireballExplosionEvent};
 use crate::entities::player::attacks::PlayerAttackEvent;
 use crate::ui::AttackType;
 use crate::PhysicsLayers;
 use bevy::app::{App, Update};
 
 use bevy::math::{vec2, vec3};
-use bevy::prelude::{
-    default, Camera, Color, Commands, Entity, EventReader, EventWriter, GlobalTransform, Plugin,
-    Query, Sprite, SpriteBundle, Transform, Vec2, Window, With,
-};
+use bevy::prelude::{default, Camera, Color, Commands, Entity, EventReader, EventWriter, GlobalTransform, Plugin, Query, Sprite, SpriteBundle, Transform, Vec2, Window, With, Vec3Swizzles, Vec2Swizzles};
 use bevy_xpbd_2d::components::{
     Collider, CollisionLayers, LinearDamping, LinearVelocity, LockedAxes, Restitution, RigidBody,
 };
@@ -23,7 +17,7 @@ pub struct SpellPlugin;
 
 impl Plugin for SpellPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(Update, (spawn_fire_ball, remove_fireball_on_collision));
+        app.add_systems(Update, (spawn_fire_ball, remove_fireball_on_collision, explosion));
     }
 }
 
@@ -93,11 +87,31 @@ pub fn spawn_fire_ball(
 
 pub fn remove_fireball_on_collision(
     mut event_writer: EventWriter<EntityDeathEvent>,
-    colliding_entities: Query<(&CollidingEntities, Entity), With<Fireball>>,
+    mut fireball_explosion_event: EventWriter<FireballExplosionEvent>,
+    colliding_entities: Query<(&CollidingEntities, Entity, &Transform), With<Fireball>>,
 ) {
-    for (collding, entity) in colliding_entities.iter() {
+    for (collding, entity, transform) in colliding_entities.iter() {
         if !collding.0.is_empty() {
+            // colliding_entities.for_each(|(_, entity)| damage_writer.send(EntityDamageEvent { entity, damage: (FIRE_BALL_DAMAGE * 20.) as f64 }));
+            fireball_explosion_event.send(FireballExplosionEvent(transform.translation.xy()));
+
             event_writer.send(EntityDeathEvent(entity));
         }
     }
+}
+
+pub fn explosion(
+    entites: Query<(Entity, &AttackableFrom, &Transform)>,
+    mut damage_writer: EventWriter<EntityDamageEvent>,
+    mut event_reader: EventReader<FireballExplosionEvent>,
+) {
+    event_reader
+        .read()
+        .for_each(|event|
+            entites
+                .iter()
+                .filter(|(_, attackable_from, _)| attackable_from.0.contains(&EntityType::Spell))
+                .filter(|(_, _, transform)| (transform.translation.xy() - event.0.xy()).length() < 25.)
+                .for_each(|(entity, _, _)| damage_writer.send(EntityDamageEvent { entity, damage: (MOB_HEALTH) as f64 })
+                ));
 }
