@@ -4,10 +4,8 @@ use crate::entities::data::{
 };
 use crate::entities::event::{EntityDamageEvent, EntityDeathEvent};
 use bevy::app::{App, Plugin, Update};
-use bevy::prelude::{
-    Color, Commands, Entity, EventReader, EventWriter, Or, Query, Res, Sprite, Time, With, Without,
-};
-use bevy_xpbd_2d::components::CollidingEntities;
+use bevy::prelude::*;
+use bevy_xpbd_2d::prelude::*;
 use iter_tools::Itertools;
 
 pub struct EntityPlugin;

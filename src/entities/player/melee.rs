@@ -10,9 +10,7 @@ use bevy::app::{App, Plugin, Update};
 
 use bevy::math::{vec2, Vec2};
 use bevy::prelude::*;
-use bevy_xpbd_2d::components::{
-    Collider, CollidingEntities, CollisionLayers, RigidBody, Rotation, Sensor,
-};
+use bevy_xpbd_2d::prelude::*;
 use iter_tools::Itertools;
 
 pub struct MeleePlugin;
@@ -105,7 +103,7 @@ fn damage_entities(
             event_writer.send(EntityDamageEvent {
                 entity: *touching_entity,
                 damage,
-            })
+            });
         }
     }
 }

@@ -1,7 +1,4 @@
-use crate::entities::data::{
-    AttackableFrom, Damage, EntityType, Health, Player, PlayerAttackCoolDown, MAX_PLAYER_HEALTH,
-    PLAYER_RADIUS, PLAYER_SPEED,
-};
+use crate::entities::data::{AttackableFrom, Damage, EntityType, Health, Player, PlayerAttackCoolDown, MAX_PLAYER_HEALTH, PLAYER_RADIUS, PLAYER_SPEED, AttackCooldown};
 use crate::entities::event::PlayerMoveEvent;
 use crate::PhysicsLayers;
 use bevy::math::{vec2, vec3};
@@ -33,9 +30,8 @@ pub fn player_setup(mut commands: Commands) {
         PlayerAttackCoolDown::default(),
         RigidBody::Dynamic,
         Restitution::new(0.),
-        Collider::ball(PLAYER_RADIUS),
-        CollisionLayers::all_masks::<PhysicsLayers>()
-            .add_groups([PhysicsLayers::Player, PhysicsLayers::Entity]),
+        Collider::circle(PLAYER_RADIUS),
+        CollisionLayers::new([PhysicsLayers::Player, PhysicsLayers::Entity],LayerMask::ALL),
         LinearVelocity(vec2(0., 0.)),
         LinearDamping(20.),
         LockedAxes::ROTATION_LOCKED,
@@ -51,25 +47,26 @@ pub fn player_setup(mut commands: Commands) {
     ));
 }
 
+
 pub fn handle_keyboard_input(
-    keys: Res<Input<KeyCode>>,
+    keys: Res<ButtonInput<KeyCode>>,
     mut player_move_event: EventWriter<PlayerMoveEvent>,
 ) {
     let mut direction = Vec2::new(0., 0.);
 
-    if keys.any_pressed([KeyCode::A, KeyCode::Left]) {
+    if keys.any_pressed([KeyCode::KeyA, KeyCode::ArrowLeft]) {
         direction.x -= 1.;
     }
 
-    if keys.any_pressed([KeyCode::D, KeyCode::Right]) {
+    if keys.any_pressed([KeyCode::KeyD, KeyCode::ArrowRight]) {
         direction.x += 1.;
     }
 
-    if keys.any_pressed([KeyCode::W, KeyCode::Up]) {
+    if keys.any_pressed([KeyCode::KeyW, KeyCode::ArrowUp]) {
         direction.y += 1.;
     }
 
-    if keys.any_pressed([KeyCode::S, KeyCode::Down]) {
+    if keys.any_pressed([KeyCode::KeyS, KeyCode::ArrowDown]) {
         direction.y -= 1.;
     }
 
@@ -77,7 +74,7 @@ pub fn handle_keyboard_input(
         return;
     }
 
-    player_move_event.send(PlayerMoveEvent(direction))
+    player_move_event.send(PlayerMoveEvent(direction));
 }
 
 pub fn move_player(

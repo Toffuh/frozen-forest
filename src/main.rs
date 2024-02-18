@@ -5,6 +5,7 @@ use crate::camera::CameraPlugin;
 use crate::entities::EntityPlugins;
 use crate::ui::UIPlugin;
 use crate::world::WorldPlugin;
+use bevy::diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin};
 use bevy::prelude::*;
 use bevy_xpbd_2d::plugins::*;
 use bevy_xpbd_2d::prelude::*;
@@ -19,14 +20,12 @@ fn main() {
         .add_plugins((
             DefaultPlugins.set(ImagePlugin::default_nearest()),
             PhysicsPlugins::default(),
-            PhysicsDebugPlugin::default(),
         ))
+        .add_plugins((FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin::default()))
         .add_plugins(EntityPlugins)
         .add_plugins(CameraPlugin)
         .add_plugins(WorldPlugin)
         .add_plugins(UIPlugin)
-        // .add_plugins(PhysicsDebugPlugin::default())
-        // .insert_resource(PhysicsDebugConfig::all())
         .insert_resource(Msaa::default())
         .insert_resource(Gravity::ZERO)
         .run();
