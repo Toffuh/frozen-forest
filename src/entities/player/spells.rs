@@ -57,9 +57,6 @@ pub fn spawn_fire_ball(
             );
             let cursor_position = Vec2::new(world_position.x, world_position.y);
             let direction = (cursor_position - player_position).normalize_or_zero();
-            let offset = direction * 50.;
-
-            let fire_ball_translation = player_position + offset;
 
             commands.spawn((
                 Fireball(),
@@ -69,7 +66,7 @@ pub fn spawn_fire_ball(
                 AttackTimer::new_attack_timer(0.),
                 Restitution::new(0.),
                 Collider::ball(FIRE_BALL_RADIUS),
-                CollisionLayers::all_masks::<PhysicsLayers>().add_group(PhysicsLayers::Spell),
+                CollisionLayers::new([PhysicsLayers::Spell], [PhysicsLayers::Mob, PhysicsLayers::Wall, PhysicsLayers::ClosedTile], ),
                 LinearVelocity(Vec2::new(direction.x, direction.y) * FIRE_BALL_SPEED),
                 LinearDamping(0.),
                 LockedAxes::ROTATION_LOCKED,
@@ -80,8 +77,8 @@ pub fn spawn_fire_ball(
                         ..default()
                     },
                     transform: Transform::from_translation(vec3(
-                        fire_ball_translation.x,
-                        fire_ball_translation.y,
+                        player_transform.translation.x,
+                        player_transform.translation.y,
                         0.,
                     )),
                     ..default()
@@ -96,7 +93,7 @@ pub fn remove_fireball_on_collision(
     colliding_entities: Query<(&CollidingEntities, Entity), With<Fireball>>,
 ) {
     for (collding, entity) in colliding_entities.iter() {
-        if !collding.0.is_empty() {
+        if !collding.0.is_empty()  {
             event_writer.send(EntityDeathEvent(entity));
         }
     }
