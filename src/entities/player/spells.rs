@@ -66,7 +66,14 @@ pub fn spawn_fire_ball(
                 AttackTimer::new_attack_timer(0.),
                 Restitution::new(0.),
                 Collider::ball(FIRE_BALL_RADIUS),
-                CollisionLayers::new([PhysicsLayers::Spell], [PhysicsLayers::Mob, PhysicsLayers::Wall, PhysicsLayers::ClosedTile], ),
+                CollisionLayers::new(
+                    [PhysicsLayers::Spell],
+                    [
+                        PhysicsLayers::Mob,
+                        PhysicsLayers::Wall,
+                        PhysicsLayers::ClosedTile,
+                    ],
+                ),
                 LinearVelocity(Vec2::new(direction.x, direction.y) * FIRE_BALL_SPEED),
                 LinearDamping(0.),
                 LockedAxes::ROTATION_LOCKED,
@@ -93,7 +100,7 @@ pub fn remove_fireball_on_collision(
     colliding_entities: Query<(&CollidingEntities, Entity), With<Fireball>>,
 ) {
     for (collding, entity) in colliding_entities.iter() {
-        if !collding.0.is_empty()  {
+        if !collding.0.is_empty() {
             event_writer.send(EntityDeathEvent(entity));
         }
     }
