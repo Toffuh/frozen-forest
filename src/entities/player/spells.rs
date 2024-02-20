@@ -60,12 +60,14 @@ pub fn spawn_fire_ball(
                 AttackTimer::new_attack_timer(0.),
                 Restitution::new(0.),
                 Collider::circle(FIRE_BALL_RADIUS),
-                CollisionLayers::new(PhysicsLayers::Spell,
+                CollisionLayers::new(
+                    PhysicsLayers::Spell,
                     [
                         PhysicsLayers::Mob,
                         PhysicsLayers::Wall,
                         PhysicsLayers::ClosedTile,
-                    ],),
+                    ],
+                ),
                 LinearVelocity(Vec2::new(direction.x, direction.y) * FIRE_BALL_SPEED),
                 LinearDamping(0.),
                 LockedAxes::ROTATION_LOCKED,

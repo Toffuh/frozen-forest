@@ -1,4 +1,7 @@
-use crate::entities::data::{AttackableFrom, Damage, EntityType, Health, Player, PlayerAttackCoolDown, MAX_PLAYER_HEALTH, PLAYER_RADIUS, PLAYER_SPEED, AttackCooldown};
+use crate::entities::data::{
+    AttackableFrom, Damage, EntityType, Health, Player, PlayerAttackCoolDown, MAX_PLAYER_HEALTH,
+    PLAYER_RADIUS, PLAYER_SPEED,
+};
 use crate::entities::event::PlayerMoveEvent;
 use crate::PhysicsLayers;
 use bevy::math::{vec2, vec3};
@@ -31,7 +34,10 @@ pub fn player_setup(mut commands: Commands) {
         RigidBody::Dynamic,
         Restitution::new(0.),
         Collider::circle(PLAYER_RADIUS),
-        CollisionLayers::new([PhysicsLayers::Player, PhysicsLayers::Entity],LayerMask::ALL),
+        CollisionLayers::new(
+            [PhysicsLayers::Player, PhysicsLayers::Entity],
+            LayerMask::ALL,
+        ),
         LinearVelocity(vec2(0., 0.)),
         LinearDamping(20.),
         LockedAxes::ROTATION_LOCKED,
@@ -46,7 +52,6 @@ pub fn player_setup(mut commands: Commands) {
         },
     ));
 }
-
 
 pub fn handle_keyboard_input(
     keys: Res<ButtonInput<KeyCode>>,

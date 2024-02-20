@@ -83,7 +83,7 @@ fn setup(mut commands: Commands, tile_assets: Res<TileAssets>) {
         AttackableFrom(vec![EntityType::Mob]),
         RigidBody::Static,
         Collider::rectangle(100., 100.),
-        CollisionLayers::new([PhysicsLayers::Mob, PhysicsLayers::Entity],LayerMask::ALL),
+        CollisionLayers::new([PhysicsLayers::Mob, PhysicsLayers::Entity], LayerMask::ALL),
         Restitution::new(0.),
         SpriteBundle {
             sprite: Sprite {
@@ -185,7 +185,7 @@ fn closed_tile(commands: &mut Commands, x: isize, y: isize) {
         },
         RigidBody::Static,
         Collider::rectangle(TILE_SIZE, TILE_SIZE),
-        CollisionLayers::new(PhysicsLayers::ClosedTile,LayerMask::ALL),
+        CollisionLayers::new(PhysicsLayers::ClosedTile, LayerMask::ALL),
         Restitution::new(0.),
     ));
 }
