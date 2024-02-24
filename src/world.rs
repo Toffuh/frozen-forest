@@ -52,28 +52,27 @@ pub struct CloseTile;
 
 #[derive(Resource)]
 pub struct TileAssets {
-    forest_tile_map: Handle<TextureAtlas>,
+    forest_layout: Handle<TextureAtlasLayout>,
+    forest_texture: Handle<Image>,
 }
 
 fn load_assets(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
-    mut texture_atlases: ResMut<Assets<TextureAtlas>>,
+    mut texture_atlases: ResMut<Assets<TextureAtlasLayout>>,
 ) {
     let texture_handle = asset_server.load("forest-ground.png");
-    let texture_atlas = TextureAtlas::from_grid(
-        texture_handle,
+    let layout_handle = texture_atlases.add(TextureAtlasLayout::from_grid(
         vec2(16., 16.),
         GROUND_SPRITE_COUNT,
         1,
         None,
         None,
-    );
-
-    let atlas_handle = texture_atlases.add(texture_atlas);
+    ));
 
     commands.insert_resource(TileAssets {
-        forest_tile_map: atlas_handle,
+        forest_layout: layout_handle,
+        forest_texture: texture_handle,
     })
 }
 
@@ -83,9 +82,8 @@ fn setup(mut commands: Commands, tile_assets: Res<TileAssets>) {
         EntityType::Wall,
         AttackableFrom(vec![EntityType::Mob]),
         RigidBody::Static,
-        Collider::cuboid(100., 100.),
-        CollisionLayers::all_masks::<PhysicsLayers>()
-            .add_groups([PhysicsLayers::Mob, PhysicsLayers::Entity]),
+        Collider::rectangle(100., 100.),
+        CollisionLayers::new([PhysicsLayers::Mob, PhysicsLayers::Entity], LayerMask::ALL),
         Restitution::new(0.),
         SpriteBundle {
             sprite: Sprite {
@@ -103,13 +101,25 @@ fn setup(mut commands: Commands, tile_assets: Res<TileAssets>) {
             if x.abs() == 2 || y.abs() == 2 {
                 closed_tile(&mut commands, x, y);
             } else {
-                open_tile(&mut commands, x, y, &tile_assets.forest_tile_map);
+                open_tile(
+                    &mut commands,
+                    x,
+                    y,
+                    &tile_assets.forest_layout,
+                    &tile_assets.forest_texture,
+                );
             }
         }
     }
 }
 
-fn open_tile(commands: &mut Commands, x: isize, y: isize, atlas_handle: &Handle<TextureAtlas>) {
+fn open_tile(
+    commands: &mut Commands,
+    x: isize,
+    y: isize,
+    layout_handle: &Handle<TextureAtlasLayout>,
+    image_handle: &Handle<Image>,
+) {
     let mut rng = thread_rng();
 
     commands
@@ -134,9 +144,12 @@ fn open_tile(commands: &mut Commands, x: isize, y: isize, atlas_handle: &Handle<
                     let y = y as f32 - SUB_TILES / 2.;
 
                     parent.spawn(SpriteSheetBundle {
-                        texture_atlas: atlas_handle.clone(),
-                        sprite: TextureAtlasSprite {
+                        atlas: TextureAtlas {
+                            layout: layout_handle.clone(),
                             index: rng.gen_range(0..GROUND_SPRITE_COUNT),
+                        },
+                        texture: image_handle.clone(),
+                        sprite: Sprite {
                             custom_size: Some(vec2(sub_tile_size, sub_tile_size)),
                             anchor: Anchor::BottomLeft,
                             ..default()
@@ -171,8 +184,8 @@ fn closed_tile(commands: &mut Commands, x: isize, y: isize) {
             ..default()
         },
         RigidBody::Static,
-        Collider::cuboid(TILE_SIZE, TILE_SIZE),
-        CollisionLayers::all_masks::<PhysicsLayers>().add_group(PhysicsLayers::ClosedTile),
+        Collider::rectangle(TILE_SIZE, TILE_SIZE),
+        CollisionLayers::new(PhysicsLayers::ClosedTile, LayerMask::ALL),
         Restitution::new(0.),
     ));
 }
@@ -192,11 +205,11 @@ fn hover_tile(
     {
         let entities = spatial_query.point_intersections(
             cursor_position,
-            SpatialQueryFilter::new().with_masks([PhysicsLayers::ClosedTile]),
+            SpatialQueryFilter::from_mask([PhysicsLayers::ClosedTile]),
         );
 
         for tile in entities {
-            hover_tile_event.send(HoverTileEvent(tile))
+            hover_tile_event.send(HoverTileEvent(tile));
         }
     }
 }
@@ -219,7 +232,7 @@ fn highlight_hovered_tiles(
 fn activate_hovered_tiles(
     mut hover_tile_event: EventReader<HoverTileEvent>,
     mut activate_tile_event: EventWriter<ActivateTileEvent>,
-    mouse_button_input: Res<Input<MouseButton>>,
+    mouse_button_input: Res<ButtonInput<MouseButton>>,
 ) {
     if !mouse_button_input.just_pressed(MouseButton::Left) {
         hover_tile_event.clear();
@@ -252,7 +265,8 @@ fn activate_tiles(
                 &mut commands,
                 grid_pos.x as isize,
                 grid_pos.y as isize,
-                &tile_assets.forest_tile_map,
+                &tile_assets.forest_layout,
+                &tile_assets.forest_texture,
             )
         })
 }

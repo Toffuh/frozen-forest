@@ -9,14 +9,8 @@ use crate::PhysicsLayers;
 use bevy::app::{App, Update};
 
 use bevy::math::{vec2, vec3};
-use bevy::prelude::{
-    default, Camera, Color, Commands, Entity, EventReader, EventWriter, GlobalTransform, Plugin,
-    Query, Sprite, SpriteBundle, Transform, Vec2, Window, With,
-};
-use bevy_xpbd_2d::components::{
-    Collider, CollisionLayers, LinearDamping, LinearVelocity, LockedAxes, Restitution, RigidBody,
-};
-use bevy_xpbd_2d::prelude::CollidingEntities;
+use bevy::prelude::*;
+use bevy_xpbd_2d::prelude::*;
 use iter_tools::Itertools;
 
 pub struct SpellPlugin;
@@ -65,9 +59,9 @@ pub fn spawn_fire_ball(
                 RigidBody::Dynamic,
                 AttackTimer::new_attack_timer(0.),
                 Restitution::new(0.),
-                Collider::ball(FIRE_BALL_RADIUS),
+                Collider::circle(FIRE_BALL_RADIUS),
                 CollisionLayers::new(
-                    [PhysicsLayers::Spell],
+                    PhysicsLayers::Spell,
                     [
                         PhysicsLayers::Mob,
                         PhysicsLayers::Wall,
