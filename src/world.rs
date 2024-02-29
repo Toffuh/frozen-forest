@@ -4,6 +4,7 @@ use bevy::math::vec2;
 use bevy::prelude::*;
 use bevy::sprite::Anchor;
 use bevy_xpbd_2d::prelude::*;
+use frozen_forest_macro::sprite_sheet;
 use iter_tools::Itertools;
 use rand::{thread_rng, Rng};
 
@@ -50,33 +51,18 @@ pub struct Tile;
 #[derive(Component)]
 pub struct CloseTile;
 
-#[derive(Resource)]
-pub struct TileAssets {
-    forest_layout: Handle<TextureAtlasLayout>,
-    forest_texture: Handle<Image>,
-}
+#[sprite_sheet(count = 9, path = "forest-ground.png")]
+pub struct ForestAssets {}
 
 fn load_assets(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
     mut texture_atlases: ResMut<Assets<TextureAtlasLayout>>,
 ) {
-    let texture_handle = asset_server.load("forest-ground.png");
-    let layout_handle = texture_atlases.add(TextureAtlasLayout::from_grid(
-        vec2(16., 16.),
-        GROUND_SPRITE_COUNT,
-        1,
-        None,
-        None,
-    ));
-
-    commands.insert_resource(TileAssets {
-        forest_layout: layout_handle,
-        forest_texture: texture_handle,
-    })
+    commands.insert_resource(ForestAssets::load(&asset_server, &mut texture_atlases))
 }
 
-fn setup(mut commands: Commands, tile_assets: Res<TileAssets>) {
+fn setup(mut commands: Commands, tile_assets: Res<ForestAssets>) {
     commands.spawn((
         Health(20.),
         EntityType::Wall,
@@ -105,8 +91,8 @@ fn setup(mut commands: Commands, tile_assets: Res<TileAssets>) {
                     &mut commands,
                     x,
                     y,
-                    &tile_assets.forest_layout,
-                    &tile_assets.forest_texture,
+                    &tile_assets.layout,
+                    &tile_assets.texture,
                 );
             }
         }
@@ -248,7 +234,7 @@ fn activate_tiles(
     mut commands: Commands,
     mut activate_tile_event: EventReader<ActivateTileEvent>,
     closed_tiles: Query<&Transform, With<CloseTile>>,
-    tile_assets: Res<TileAssets>,
+    tile_assets: Res<ForestAssets>,
 ) {
     activate_tile_event
         .read()
@@ -265,8 +251,8 @@ fn activate_tiles(
                 &mut commands,
                 grid_pos.x as isize,
                 grid_pos.y as isize,
-                &tile_assets.forest_layout,
-                &tile_assets.forest_texture,
+                &tile_assets.layout,
+                &tile_assets.texture,
             )
         })
 }
