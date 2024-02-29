@@ -71,7 +71,7 @@ pub fn sprite_sheet(args: TokenStream, input: TokenStream) -> TokenStream {
                     None,
                 ));
 
-                ForestAssets {
+                Self {
                     layout: layout_handle,
                     texture: texture_handle,
                 }

@@ -48,6 +48,9 @@ pub struct CloseTile;
 #[sprite_sheet(count = 9, path = "forest-ground.png")]
 pub struct ForestAssets {}
 
+#[sprite_sheet(count = 4, path = "tree.png")]
+pub struct TreeAssets {}
+
 fn load_assets(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
