@@ -144,9 +144,17 @@ fn open_tile(
             }
         });
 
+    let mut tree_positions = vec![];
+
     for _ in 0..rng.gen_range(10..20) {
         let x = rng.gen_range(0..SUB_TILES as usize);
         let y = rng.gen_range(0..SUB_TILES as usize);
+
+        if tree_positions.contains(&(x, y)) {
+            continue;
+        }
+
+        tree_positions.push((x, y));
 
         commands
             .spawn(SpriteSheetBundle {
@@ -176,6 +184,8 @@ fn open_tile(
                     },
                     RigidBody::Static,
                     Collider::circle(TREE_SPRITE_SIZE / 4.),
+                    CollisionLayers::new(PhysicsLayers::Tree, LayerMask::ALL),
+                    Restitution::new(0.),
                 ));
             });
     }
