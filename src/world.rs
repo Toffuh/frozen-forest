@@ -18,15 +18,9 @@ impl Plugin for WorldPlugin {
                 Update,
                 (
                     hover_tile,
-                    (
-                        highlight_hovered_tiles,
-                        (
-                            activate_hovered_tiles,
-                            activate_tiles,
-                            create_surrounding_tiles,
-                        )
-                            .chain(),
-                    ),
+                    (highlight_hovered_tiles, activate_hovered_tiles),
+                    create_surrounding_tiles,
+                    activate_tiles,
                 )
                     .chain(),
             )
@@ -262,6 +256,10 @@ fn create_surrounding_tiles(
     mut activate_tile_event: EventReader<ActivateTileEvent>,
     tiles: Query<&Transform, With<Tile>>,
 ) {
+    if activate_tile_event.is_empty() {
+        return;
+    }
+
     let mut filled_positions = tiles
         .iter()
         .map(|tile| {
