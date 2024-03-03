@@ -10,6 +10,7 @@ pub static MOB_DAMAGE: f32 = 4.;
 pub static PLAYER_SPEED: f32 = 175.;
 pub static PLAYER_RADIUS: f32 = 8.;
 pub static MAX_PLAYER_HEALTH: f64 = 30.;
+pub static PLAYER_DAMAGE: f64 = 5.;
 
 pub static FIRE_BALL_RADIUS: f32 = 6.;
 pub static FIRE_BALL_SPEED: f32 = 300.;
@@ -29,6 +30,9 @@ pub struct Mob;
 
 #[derive(Component)]
 pub struct Fireball();
+
+#[derive(Component)]
+pub struct AOE();
 
 #[derive(PartialEq, Component, Debug)]
 pub enum EntityType {

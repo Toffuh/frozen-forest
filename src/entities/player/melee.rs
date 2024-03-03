@@ -1,6 +1,4 @@
-use crate::entities::data::{
-    AttackableFrom, Damage, DespawnTimer, EntityType, Player, PLAYER_RADIUS,
-};
+use crate::entities::data::{AOE, AttackableFrom, Damage, DespawnTimer, EntityType, Player, PLAYER_DAMAGE, PLAYER_RADIUS};
 use crate::entities::event::EntityDamageEvent;
 use crate::entities::player::attacks::PlayerAttackEvent;
 
@@ -63,6 +61,8 @@ fn spawn_player_attack(
             PlayerAttack {
                 damaged_entities: vec![],
             },
+            AOE(),
+            Damage(PLAYER_DAMAGE),
             Rotation::from_radians(Vec2::X.angle_between(dir)),
             SpriteBundle {
                 sprite: Sprite {

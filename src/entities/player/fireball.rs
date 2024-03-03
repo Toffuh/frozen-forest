@@ -1,4 +1,4 @@
-use crate::entities::data::{AttackTimer, Damage, EntityType, Fireball, Player, FIRE_BALL_DAMAGE, FIRE_BALL_RADIUS, FIRE_BALL_SPEED, AttackableFrom, MOB_HEALTH, PLAYER_RADIUS, DespawnTimer};
+use crate::entities::data::{AttackTimer, Damage, EntityType, Fireball, Player, FIRE_BALL_DAMAGE, FIRE_BALL_RADIUS, FIRE_BALL_SPEED, AttackableFrom, MOB_HEALTH, PLAYER_RADIUS, DespawnTimer, AOE, PLAYER_DAMAGE};
 use crate::entities::event::{EntityDamageEvent, EntityDeathEvent};
 use crate::entities::player::attacks::{PlayerAttackEvent};
 use crate::ui::AttackType;
@@ -118,6 +118,8 @@ fn spawn_fireball_attack(
             FireballAttack {
                 damaged_entities: vec![],
             },
+            AOE(),
+            Damage(FIRE_BALL_DAMAGE * 2.),
             SpriteBundle {
                 sprite: Sprite {
                     color: Color::rgb(0., 1., 0.),
