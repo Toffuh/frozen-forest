@@ -1,8 +1,8 @@
+use crate::entities::data::{AttackableFrom, Damage, EntityType};
+use crate::entities::event::EntityDamageEvent;
 use bevy::app::{App, Plugin, Update};
 use bevy::prelude::{Component, Entity, EventWriter, Query};
 use bevy_xpbd_2d::prelude::CollidingEntities;
-use crate::entities::data::{AttackableFrom, Damage, EntityType};
-use crate::entities::event::{EntityDamageEvent};
 
 pub struct LongTimeAttackPlugin;
 
@@ -11,7 +11,6 @@ impl Plugin for LongTimeAttackPlugin {
         app.add_systems(Update, damage_entities);
     }
 }
-
 
 #[derive(Component)]
 pub struct LongTimeAttack {

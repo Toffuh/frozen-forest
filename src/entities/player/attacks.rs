@@ -1,4 +1,4 @@
-use crate::entities::data::{ Player, PlayerAttackCoolDown};
+use crate::entities::data::{Player, PlayerAttackCoolDown};
 
 use crate::ui::{AttackType, InventorySlot, SelectedSlot};
 

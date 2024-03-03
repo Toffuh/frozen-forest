@@ -1,20 +1,20 @@
 use crate::entities::entity::EntityPlugin;
 use crate::entities::event::EventPlugin;
+use crate::entities::longtime_attack::LongTimeAttackPlugin;
 use crate::entities::mob::MobPlugin;
 use crate::entities::player::attacks::AttackPlugin;
-use crate::entities::player::melee::MeleePlugin;
 use crate::entities::player::fireball::SpellPlugin;
+use crate::entities::player::melee::MeleePlugin;
 use crate::entities::player::PlayerPlugin;
 use bevy::app::PluginGroupBuilder;
 use bevy::prelude::PluginGroup;
-use crate::entities::longtime_attack::LongTimeAttackPlugin;
 
 pub mod data;
 pub mod entity;
 pub mod event;
+pub mod longtime_attack;
 pub mod mob;
 pub mod player;
-pub mod longtime_attack;
 
 pub struct EntityPlugins;
 
