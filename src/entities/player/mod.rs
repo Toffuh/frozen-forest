@@ -11,7 +11,7 @@ use std::ops::Mul;
 
 pub mod attacks;
 pub mod melee;
-pub mod spells;
+pub mod fireball;
 
 pub struct PlayerPlugin;
 

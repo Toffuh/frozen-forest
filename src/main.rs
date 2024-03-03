@@ -38,5 +38,5 @@ pub enum PhysicsLayers {
     Entity,
     Wall,
     ClosedTile,
-    Spell,
+    Fireball,
 }

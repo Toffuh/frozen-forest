@@ -3,7 +3,7 @@ use crate::entities::event::EventPlugin;
 use crate::entities::mob::MobPlugin;
 use crate::entities::player::attacks::AttackPlugin;
 use crate::entities::player::melee::MeleePlugin;
-use crate::entities::player::spells::SpellPlugin;
+use crate::entities::player::fireball::SpellPlugin;
 use crate::entities::player::PlayerPlugin;
 use bevy::app::PluginGroupBuilder;
 use bevy::prelude::PluginGroup;
