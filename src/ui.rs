@@ -133,22 +133,22 @@ fn setup(mut commands: Commands) {
 }
 
 fn select_inventory_slot_keyboard(
-    keyboard_input: Res<Input<KeyCode>>,
+    keyboard_input: Res<ButtonInput<KeyCode>>,
     mut selected_slot: ResMut<SelectedSlot>,
 ) {
-    if keyboard_input.just_pressed(KeyCode::Key1) {
+    if keyboard_input.just_pressed(KeyCode::Digit1) {
         selected_slot.index = 0;
     }
-    if keyboard_input.just_pressed(KeyCode::Key2) {
+    if keyboard_input.just_pressed(KeyCode::Digit2) {
         selected_slot.index = 1;
     }
-    if keyboard_input.just_pressed(KeyCode::Key3) {
+    if keyboard_input.just_pressed(KeyCode::Digit3) {
         selected_slot.index = 2;
     }
-    if keyboard_input.just_pressed(KeyCode::Key4) {
+    if keyboard_input.just_pressed(KeyCode::Digit4) {
         selected_slot.index = 3;
     }
-    if keyboard_input.just_pressed(KeyCode::Key5) {
+    if keyboard_input.just_pressed(KeyCode::Digit5) {
         selected_slot.index = 4;
     }
 }

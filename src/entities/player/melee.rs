@@ -11,6 +11,7 @@ use bevy::prelude::*;
 use bevy_xpbd_2d::components::{
     Collider, CollisionLayers, RigidBody, Rotation, Sensor,
 };
+use bevy_xpbd_2d::prelude::*;
 use iter_tools::Itertools;
 use crate::entities::longtimeAttack::LongTimeAttack;
 

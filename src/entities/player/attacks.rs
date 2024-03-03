@@ -3,7 +3,6 @@ use crate::entities::data::{ AttackableFrom, Damage, EntityType, Player, PlayerA
 use crate::ui::{AttackType, InventorySlot, SelectedSlot};
 
 use bevy::app::{App, Plugin, Update};
-use bevy::input::Input;
 
 use bevy::prelude::*;
 use bevy_xpbd_2d::components::CollidingEntities;
@@ -22,7 +21,7 @@ impl Plugin for AttackPlugin {
 pub struct PlayerAttackEvent(pub AttackType);
 
 fn player_attack(
-    mouse_button_input: Res<Input<MouseButton>>,
+    mouse_button_input: Res<ButtonInput<MouseButton>>,
     mut player_query: Query<&mut PlayerAttackCoolDown, With<Player>>,
     time: Res<Time>,
     mut attack_event: EventWriter<PlayerAttackEvent>,

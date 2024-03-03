@@ -1,3 +1,6 @@
+[workspace]
+members = ["frozen-forest-macro"]
+
 [package]
 name = "frozen-forest"
 version = "0.1.0"
@@ -6,10 +9,11 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-bevy = { version = "0.12.1", features = ["dynamic_linking", "wayland"] }
-bevy_xpbd_2d = "0.3.3"
+bevy = { version = "0.13.0", features = ["dynamic_linking"] }
+bevy_xpbd_2d = "0.4.0"
 iter_tools = "0.4.0"
 rand = "0.8.5"
+frozen-forest-macro = { path = "frozen-forest-macro" }
 
 # Enable a small amount of optimization in debug mode
 [profile.dev]

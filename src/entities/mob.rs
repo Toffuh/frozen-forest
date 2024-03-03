@@ -34,9 +34,8 @@ pub fn spawn_mobs(mut commands: Commands) {
             AttackTimer::new_attack_timer(2.),
             RigidBody::Dynamic,
             Restitution::new(0.),
-            Collider::ball(MOB_RADIUS),
-            CollisionLayers::all_masks::<PhysicsLayers>()
-                .add_groups([PhysicsLayers::Mob, PhysicsLayers::Entity]),
+            Collider::circle(MOB_RADIUS),
+            CollisionLayers::new([PhysicsLayers::Mob, PhysicsLayers::Entity], LayerMask::ALL),
             LinearVelocity(vec2(0., 0.)),
             LinearDamping(20.),
             LockedAxes::ROTATION_LOCKED,

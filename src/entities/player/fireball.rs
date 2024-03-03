@@ -9,6 +9,8 @@ use bevy::math::{vec2, vec3};
 use bevy::prelude::*;
 use bevy_xpbd_2d::components::{Collider, CollisionLayers, LinearDamping, LinearVelocity, LockedAxes, Restitution, RigidBody, Sensor};
 use bevy_xpbd_2d::prelude::CollidingEntities;
+use bevy::prelude::*;
+use bevy_xpbd_2d::prelude::*;
 use iter_tools::Itertools;
 use crate::entities::longtimeAttack::LongTimeAttack;
 
@@ -54,17 +56,21 @@ pub fn spawn_fire_ball(
             );
             let cursor_position = Vec2::new(world_position.x, world_position.y);
             let direction = (cursor_position - player_position).normalize_or_zero();
-            let offset = direction * 50.;
-
-            let fire_ball_translation = player_position + offset;
 
             commands.spawn((
                 Fireball(),
                 EntityType::Spell,
                 RigidBody::Dynamic,
                 Restitution::new(0.),
-                Collider::ball(FIRE_BALL_RADIUS),
-                CollisionLayers::all_masks::<PhysicsLayers>().add_group(PhysicsLayers::Fireball),
+                Collider::circle(FIRE_BALL_RADIUS),
+                CollisionLayers::new(
+                    PhysicsLayers::Spell,
+                    [
+                        PhysicsLayers::Mob,
+                        PhysicsLayers::Wall,
+                        PhysicsLayers::ClosedTile,
+                    ],
+                ),
                 LinearVelocity(Vec2::new(direction.x, direction.y) * FIRE_BALL_SPEED),
                 LinearDamping(0.),
                 LockedAxes::ROTATION_LOCKED,
@@ -75,8 +81,8 @@ pub fn spawn_fire_ball(
                         ..default()
                     },
                     transform: Transform::from_translation(vec3(
-                        fire_ball_translation.x,
-                        fire_ball_translation.y,
+                        player_transform.translation.x,
+                        player_transform.translation.y,
                         0.,
                     )),
                     ..default()
