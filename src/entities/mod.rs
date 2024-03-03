@@ -7,14 +7,14 @@ use crate::entities::player::fireball::SpellPlugin;
 use crate::entities::player::PlayerPlugin;
 use bevy::app::PluginGroupBuilder;
 use bevy::prelude::PluginGroup;
-use crate::entities::longtimeAttack::LongTimeAttackPlugin;
+use crate::entities::longtime_attack::LongTimeAttackPlugin;
 
 pub mod data;
 pub mod entity;
 pub mod event;
 pub mod mob;
 pub mod player;
-mod longtimeAttack;
+pub mod longtime_attack;
 
 pub struct EntityPlugins;
 

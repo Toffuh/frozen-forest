@@ -1,12 +1,10 @@
-use crate::entities::data::{ AttackableFrom, Damage, EntityType, Player, PlayerAttackCoolDown};
+use crate::entities::data::{ Player, PlayerAttackCoolDown};
 
 use crate::ui::{AttackType, InventorySlot, SelectedSlot};
 
 use bevy::app::{App, Plugin, Update};
 
 use bevy::prelude::*;
-use bevy_xpbd_2d::components::CollidingEntities;
-use crate::entities::event::EntityDamageEvent;
 
 pub struct AttackPlugin;
 

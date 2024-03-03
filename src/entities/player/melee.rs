@@ -8,12 +8,9 @@ use bevy::app::{App, Plugin, Update};
 
 use bevy::math::{vec2, Vec2};
 use bevy::prelude::*;
-use bevy_xpbd_2d::components::{
-    Collider, CollisionLayers, RigidBody, Rotation, Sensor,
-};
 use bevy_xpbd_2d::prelude::*;
 use iter_tools::Itertools;
-use crate::entities::longtimeAttack::LongTimeAttack;
+use crate::entities::longtime_attack::LongTimeAttack;
 
 pub struct MeleePlugin;
 
