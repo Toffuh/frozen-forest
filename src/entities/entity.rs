@@ -3,7 +3,7 @@ use crate::entities::data::{
     Player,
 };
 use crate::entities::event::{EntityDamageEvent, EntityDeathEvent};
-use bevy::app::{App, Plugin, Update};
+use bevy::app::{App, Plugin, PostUpdate, Update};
 use bevy::prelude::{
     Color, Commands, Entity, EventReader, EventWriter, Or, Query, Res, Sprite, Time, With, Without,
 };
@@ -14,19 +14,17 @@ pub struct EntityPlugin;
 
 impl Plugin for EntityPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(
-            Update,
-            (deal_damage_on_collision, deal_damage, remove_dead_entities),
-        )
-        .add_systems(
-            Update,
-            (
-                tick_damage_cool_down,
-                remove_damage_cool_down,
-                color_mob_on_damage,
-                despawn,
-            ),
-        );
+        app.add_systems(Update, (deal_damage_on_collision, deal_damage))
+            .add_systems(PostUpdate, remove_dead_entities)
+            .add_systems(
+                Update,
+                (
+                    tick_damage_cool_down,
+                    remove_damage_cool_down,
+                    color_mob_on_damage,
+                    despawn,
+                ),
+            );
     }
 }
 
