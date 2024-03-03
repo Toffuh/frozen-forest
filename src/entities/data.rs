@@ -31,9 +31,6 @@ pub struct Mob;
 #[derive(Component)]
 pub struct Fireball();
 
-#[derive(Component)]
-pub struct AOE();
-
 #[derive(PartialEq, Component, Debug)]
 pub enum EntityType {
     Player,

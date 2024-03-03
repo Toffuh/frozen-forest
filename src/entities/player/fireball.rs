@@ -1,6 +1,6 @@
-use crate::entities::data::{AttackTimer, Damage, EntityType, Fireball, Player, FIRE_BALL_DAMAGE, FIRE_BALL_RADIUS, FIRE_BALL_SPEED, AttackableFrom, MOB_HEALTH, PLAYER_RADIUS, DespawnTimer, AOE, PLAYER_DAMAGE};
+use crate::entities::data::{AttackTimer, Damage, EntityType, Fireball, Player, FIRE_BALL_DAMAGE, FIRE_BALL_RADIUS, FIRE_BALL_SPEED, AttackableFrom, MOB_HEALTH, PLAYER_RADIUS, DespawnTimer, PLAYER_DAMAGE};
 use crate::entities::event::{EntityDamageEvent, EntityDeathEvent};
-use crate::entities::player::attacks::{PlayerAttackEvent};
+use crate::entities::player::attacks::{LongTimeAttack, PlayerAttackEvent};
 use crate::ui::AttackType;
 use crate::PhysicsLayers;
 use bevy::app::{App, Update};
@@ -102,10 +102,10 @@ pub fn remove_fireball_on_collision(
     }
 }
 
-#[derive(Component)]
-struct FireballAttack {
-    damaged_entities: Vec<Entity>,
-}
+// #[derive(Component)]
+// struct FireballAttack {
+//     damaged_entities: Vec<Entity>,
+// }
 
 fn spawn_fireball_attack(
     mut commands: Commands,
@@ -115,11 +115,10 @@ fn spawn_fireball_attack(
         let fireball_pos = event.0;
 
         commands.spawn((
-            FireballAttack {
+            LongTimeAttack {
                 damaged_entities: vec![],
             },
-            AOE(),
-            Damage(FIRE_BALL_DAMAGE * 2.),
+            Damage(FIRE_BALL_DAMAGE as f64),
             SpriteBundle {
                 sprite: Sprite {
                     color: Color::rgb(0., 1., 0.),

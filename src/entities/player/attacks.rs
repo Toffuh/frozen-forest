@@ -1,4 +1,4 @@
-use crate::entities::data::{AOE, AttackableFrom, Damage, EntityType, Player, PlayerAttackCoolDown};
+use crate::entities::data::{ AttackableFrom, Damage, EntityType, Player, PlayerAttackCoolDown};
 
 use crate::ui::{AttackType, InventorySlot, SelectedSlot};
 
@@ -20,19 +20,16 @@ impl Plugin for AttackPlugin {
 }
 
 #[derive(Component)]
-struct EntityAttack {
-    damaged_entities: Vec<Entity>,
+pub struct LongTimeAttack {
+    pub damaged_entities: Vec<Entity>,
 }
 
 fn damage_entities(
-    mut entity_attacks: Query<(&CollidingEntities, &mut EntityAttack)>,
-    damage: Query<&Damage, With<AOE>>,
+    mut entity_attacks: Query<(&CollidingEntities, &mut LongTimeAttack, &Damage)>,
     attackable_from: Query<&AttackableFrom>,
     mut event_writer: EventWriter<EntityDamageEvent>,
 ) {
-    let damage = damage.single().0;
-
-    for (touching_entities, mut entity_attack) in entity_attacks.iter_mut() {
+    for (touching_entities, mut entity_attack, damage) in entity_attacks.iter_mut() {
         for touching_entity in &touching_entities.0 {
             let can_be_attacked = attackable_from
                 .get(*touching_entity)
@@ -46,7 +43,7 @@ fn damage_entities(
             entity_attack.damaged_entities.push(*touching_entity);
             event_writer.send(EntityDamageEvent {
                 entity: *touching_entity,
-                damage,
+                damage: damage.0,
             })
         }
     }

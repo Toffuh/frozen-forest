@@ -1,6 +1,6 @@
-use crate::entities::data::{AOE, AttackableFrom, Damage, DespawnTimer, EntityType, Player, PLAYER_DAMAGE, PLAYER_RADIUS};
+use crate::entities::data::{ AttackableFrom, Damage, DespawnTimer, EntityType, Player, PLAYER_DAMAGE, PLAYER_RADIUS};
 use crate::entities::event::EntityDamageEvent;
-use crate::entities::player::attacks::PlayerAttackEvent;
+use crate::entities::player::attacks::{LongTimeAttack, PlayerAttackEvent};
 
 use crate::ui::AttackType;
 use crate::PhysicsLayers;
@@ -17,14 +17,14 @@ pub struct MeleePlugin;
 
 impl Plugin for MeleePlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(Update, (spawn_player_attack, damage_entities));
+        app.add_systems(Update, (spawn_player_attack));
     }
 }
-
-#[derive(Component)]
-struct PlayerAttack {
-    damaged_entities: Vec<Entity>,
-}
+// 
+// #[derive(Component)]
+// struct PlayerAttack {
+//     damaged_entities: Vec<Entity>,
+// }
 
 fn spawn_player_attack(
     windows: Query<&Window>,
@@ -58,10 +58,9 @@ fn spawn_player_attack(
         let collider_pos = (dir * (PLAYER_RADIUS * 2.)).xy() + player_pos;
 
         commands.spawn((
-            PlayerAttack {
+            LongTimeAttack {
                 damaged_entities: vec![],
             },
-            AOE(),
             Damage(PLAYER_DAMAGE),
             Rotation::from_radians(Vec2::X.angle_between(dir)),
             SpriteBundle {
@@ -82,30 +81,30 @@ fn spawn_player_attack(
     }
 }
 
-fn damage_entities(
-    mut player_attacks: Query<(&CollidingEntities, &mut PlayerAttack)>,
-    player_damage: Query<&Damage, With<Player>>,
-    attackable_from: Query<&AttackableFrom>,
-    mut event_writer: EventWriter<EntityDamageEvent>,
-) {
-    let damage = player_damage.single().0;
-
-    for (touching_entities, mut player_attack) in player_attacks.iter_mut() {
-        for touching_entity in &touching_entities.0 {
-            let can_be_attacked = attackable_from
-                .get(*touching_entity)
-                .map(|attackable_from| attackable_from.0.contains(&EntityType::Player))
-                .unwrap_or(false);
-
-            if !can_be_attacked || player_attack.damaged_entities.contains(touching_entity) {
-                continue;
-            }
-
-            player_attack.damaged_entities.push(*touching_entity);
-            event_writer.send(EntityDamageEvent {
-                entity: *touching_entity,
-                damage,
-            })
-        }
-    }
-}
+// fn damage_entities(
+//     mut player_attacks: Query<(&CollidingEntities, &mut PlayerAttack)>,
+//     player_damage: Query<&Damage, With<Player>>,
+//     attackable_from: Query<&AttackableFrom>,
+//     mut event_writer: EventWriter<EntityDamageEvent>,
+// ) {
+//     let damage = player_damage.single().0;
+// 
+//     for (touching_entities, mut player_attack) in player_attacks.iter_mut() {
+//         for touching_entity in &touching_entities.0 {
+//             let can_be_attacked = attackable_from
+//                 .get(*touching_entity)
+//                 .map(|attackable_from| attackable_from.0.contains(&EntityType::Player))
+//                 .unwrap_or(false);
+// 
+//             if !can_be_attacked || player_attack.damaged_entities.contains(touching_entity) {
+//                 continue;
+//             }
+// 
+//             player_attack.damaged_entities.push(*touching_entity);
+//             event_writer.send(EntityDamageEvent {
+//                 entity: *touching_entity,
+//                 damage,
+//             })
+//         }
+//     }
+// }
