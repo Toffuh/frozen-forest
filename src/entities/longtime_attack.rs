@@ -1,7 +1,7 @@
-use crate::entities::data::{AttackableFrom, Damage, EntityType};
+use crate::entities::data::{AttackableFrom, Damage, EntityType, Health};
 use crate::entities::event::EntityDamageEvent;
 use bevy::app::{App, Plugin, Update};
-use bevy::prelude::{Component, Entity, EventWriter, Query};
+use bevy::prelude::{Component, Entity, EventWriter, Query, With};
 use bevy_xpbd_2d::prelude::CollidingEntities;
 
 pub struct LongTimeAttackPlugin;
@@ -19,7 +19,7 @@ pub struct LongTimeAttack {
 
 fn damage_entities(
     mut entity_attacks: Query<(&CollidingEntities, &mut LongTimeAttack, &Damage)>,
-    attackable_from: Query<&AttackableFrom>,
+    attackable_from: Query<&AttackableFrom, With<Health>>,
     mut event_writer: EventWriter<EntityDamageEvent>,
 ) {
     for (touching_entities, mut entity_attack, damage) in entity_attacks.iter_mut() {
