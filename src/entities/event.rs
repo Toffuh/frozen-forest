@@ -8,6 +8,7 @@ impl Plugin for EventPlugin {
     fn build(&self, app: &mut App) {
         app.add_event::<EntityDamageEvent>()
             .add_event::<EntityDeathEvent>()
+            .add_event::<FireballExplosionEvent>()
             .add_event::<PlayerMoveEvent>();
     }
 }
@@ -23,3 +24,6 @@ pub struct EntityDeathEvent(pub Entity);
 
 #[derive(Event)]
 pub struct PlayerMoveEvent(pub Vec2);
+
+#[derive(Event)]
+pub struct FireballExplosionEvent(pub Vec2);

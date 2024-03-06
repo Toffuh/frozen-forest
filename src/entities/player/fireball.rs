@@ -1,5 +1,5 @@
 use crate::entities::data::{
-    AttackTimer, Damage, EntityType, Fireball, Player, FIRE_BALL_DAMAGE, FIRE_BALL_RADIUS,
+    Damage, DespawnTimer, EntityType, Fireball, Player, FIRE_BALL_DAMAGE, FIRE_BALL_RADIUS,
     FIRE_BALL_SPEED,
 };
 use crate::entities::event::EntityDeathEvent;
@@ -8,8 +8,13 @@ use crate::ui::AttackType;
 use crate::PhysicsLayers;
 use bevy::app::{App, Update};
 
+use crate::entities::longtime_attack::LongTimeAttack;
 use bevy::math::{vec2, vec3};
 use bevy::prelude::*;
+use bevy_xpbd_2d::components::{
+    CollisionLayers, LinearDamping, LinearVelocity, LockedAxes, Restitution, RigidBody,
+};
+use bevy_xpbd_2d::prelude::CollidingEntities;
 use bevy_xpbd_2d::prelude::*;
 use iter_tools::Itertools;
 
@@ -17,9 +22,20 @@ pub struct SpellPlugin;
 
 impl Plugin for SpellPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(Update, (spawn_fire_ball, remove_fireball_on_collision));
+        app.add_systems(
+            Update,
+            (
+                spawn_fire_ball,
+                remove_fireball_on_collision,
+                spawn_fireball_explosion,
+            ),
+        )
+        .add_event::<FireballExplosionEvent>();
     }
 }
+
+#[derive(Event, PartialEq)]
+pub struct FireballExplosionEvent(Vec2);
 
 pub fn spawn_fire_ball(
     mut commands: Commands,
@@ -55,13 +71,11 @@ pub fn spawn_fire_ball(
             commands.spawn((
                 Fireball(),
                 EntityType::Spell,
-                Damage(FIRE_BALL_DAMAGE as f64),
                 RigidBody::Dynamic,
-                AttackTimer::new_attack_timer(0.),
                 Restitution::new(0.),
                 Collider::circle(FIRE_BALL_RADIUS),
                 CollisionLayers::new(
-                    PhysicsLayers::Spell,
+                    PhysicsLayers::Fireball,
                     [
                         PhysicsLayers::Mob,
                         PhysicsLayers::Wall,
@@ -91,11 +105,45 @@ pub fn spawn_fire_ball(
 
 pub fn remove_fireball_on_collision(
     mut event_writer: EventWriter<EntityDeathEvent>,
-    colliding_entities: Query<(&CollidingEntities, Entity), With<Fireball>>,
+    mut fireball_explosion_event: EventWriter<FireballExplosionEvent>,
+    fireballs: Query<(&CollidingEntities, Entity, &Transform), With<Fireball>>,
 ) {
-    for (collding, entity) in colliding_entities.iter() {
-        if !collding.0.is_empty() {
-            event_writer.send(EntityDeathEvent(entity));
+    for (collding_entitys, fireball_entity, fireball_transform) in fireballs.iter() {
+        if !collding_entitys.0.is_empty() {
+            event_writer.send(EntityDeathEvent(fireball_entity));
+
+            fireball_explosion_event
+                .send(FireballExplosionEvent(fireball_transform.translation.xy()));
         }
+    }
+}
+
+fn spawn_fireball_explosion(
+    mut commands: Commands,
+    mut attack_event: EventReader<FireballExplosionEvent>,
+) {
+    for event in attack_event.read() {
+        let fireball_pos = event.0;
+
+        commands.spawn((
+            LongTimeAttack {
+                damaged_entities: vec![],
+            },
+            Damage(FIRE_BALL_DAMAGE as f64),
+            SpriteBundle {
+                sprite: Sprite {
+                    color: Color::rgb(0., 1., 0.),
+                    custom_size: Some(vec2(50., 50.)),
+                    ..default()
+                },
+                transform: Transform::from_xyz(fireball_pos.x, fireball_pos.y, 0.),
+                ..default()
+            },
+            DespawnTimer::from_seconds(0.2),
+            Sensor,
+            CollisionLayers::new([PhysicsLayers::Fireball], [PhysicsLayers::Mob]),
+            Collider::circle(25.),
+            RigidBody::Static,
+        ));
     }
 }

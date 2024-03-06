@@ -10,8 +10,8 @@ use bevy_xpbd_2d::prelude::*;
 use std::ops::Mul;
 
 pub mod attacks;
+pub mod fireball;
 pub mod melee;
-pub mod spells;
 
 pub struct PlayerPlugin;
 
