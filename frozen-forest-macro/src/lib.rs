@@ -71,10 +71,23 @@ pub fn sprite_sheet(args: TokenStream, input: TokenStream) -> TokenStream {
                     None,
                 ));
 
-                ForestAssets {
+                Self {
                     layout: layout_handle,
                     texture: texture_handle,
                 }
+            }
+
+            fn atlas(&self) -> TextureAtlas {
+                let mut rng = thread_rng();
+
+                TextureAtlas {
+                    layout: self.layout.clone(),
+                    index: rng.gen_range(0..#count),
+                }
+            }
+
+            fn texture(&self) -> Handle<Image> {
+                self.texture.clone()
             }
         }
     };

@@ -2,7 +2,6 @@ use crate::entities::data::{AttackableFrom, EntityType, Health};
 use crate::PhysicsLayers;
 use bevy::math::vec2;
 use bevy::prelude::*;
-use bevy::sprite::Anchor;
 use bevy_xpbd_2d::prelude::*;
 use frozen_forest_macro::sprite_sheet;
 use iter_tools::Itertools;
@@ -30,8 +29,10 @@ impl Plugin for WorldPlugin {
 }
 
 pub static SUB_TILES: f32 = 15.;
-pub static TILE_SIZE: f32 = SUB_TILES * 16.;
-pub static GROUND_SPRITE_COUNT: usize = 9;
+pub static SUB_TILE_SIZE: f32 = 16.;
+pub static TILE_SIZE: f32 = SUB_TILES * SUB_TILE_SIZE;
+
+pub static TREE_SPRITE_SIZE: f32 = 16.;
 
 #[derive(Event)]
 pub struct HoverTileEvent(Entity);
@@ -46,17 +47,28 @@ pub struct Tile;
 pub struct CloseTile;
 
 #[sprite_sheet(count = 9, path = "forest-ground.png")]
-pub struct ForestAssets {}
+pub struct ForestGroundAssets {}
+
+#[sprite_sheet(count = 4, path = "tree.png")]
+pub struct TreeAssets {}
 
 fn load_assets(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
     mut texture_atlases: ResMut<Assets<TextureAtlasLayout>>,
 ) {
-    commands.insert_resource(ForestAssets::load(&asset_server, &mut texture_atlases))
+    commands.insert_resource(ForestGroundAssets::load(
+        &asset_server,
+        &mut texture_atlases,
+    ));
+    commands.insert_resource(TreeAssets::load(&asset_server, &mut texture_atlases));
 }
 
-fn setup(mut commands: Commands, tile_assets: Res<ForestAssets>) {
+fn setup(
+    mut commands: Commands,
+    ground_assets: Res<ForestGroundAssets>,
+    tree_assets: Res<TreeAssets>,
+) {
     commands.spawn((
         Health(20.),
         EntityType::Wall,
@@ -81,13 +93,7 @@ fn setup(mut commands: Commands, tile_assets: Res<ForestAssets>) {
             if x.abs() == 2 || y.abs() == 2 {
                 closed_tile(&mut commands, x, y);
             } else {
-                open_tile(
-                    &mut commands,
-                    x,
-                    y,
-                    &tile_assets.layout,
-                    &tile_assets.texture,
-                );
+                open_tile(&mut commands, x, y, &ground_assets, &tree_assets);
             }
         }
     }
@@ -97,26 +103,23 @@ fn open_tile(
     commands: &mut Commands,
     x: isize,
     y: isize,
-    layout_handle: &Handle<TextureAtlasLayout>,
-    image_handle: &Handle<Image>,
+    forest_ground_assets: &ForestGroundAssets,
+    tree_assets: &TreeAssets,
 ) {
     let mut rng = thread_rng();
+
+    let tile_x = x as f32 * TILE_SIZE;
+    let tile_y = y as f32 * TILE_SIZE;
 
     commands
         .spawn((
             Tile,
             SpatialBundle {
-                transform: Transform::from_translation(Vec3::new(
-                    x as f32 * TILE_SIZE,
-                    y as f32 * TILE_SIZE,
-                    -5.,
-                )),
+                transform: Transform::from_translation(Vec3::new(tile_x, tile_y, -5.)),
                 ..default()
             },
         ))
         .with_children(|parent| {
-            let sub_tile_size = TILE_SIZE / SUB_TILES;
-
             for x in 0..SUB_TILES as i32 {
                 for y in 0..SUB_TILES as i32 {
                     //offset so 0/0 is in the center of the tile
@@ -124,19 +127,15 @@ fn open_tile(
                     let y = y as f32 - SUB_TILES / 2.;
 
                     parent.spawn(SpriteSheetBundle {
-                        atlas: TextureAtlas {
-                            layout: layout_handle.clone(),
-                            index: rng.gen_range(0..GROUND_SPRITE_COUNT),
-                        },
-                        texture: image_handle.clone(),
+                        atlas: forest_ground_assets.atlas(),
+                        texture: forest_ground_assets.texture(),
                         sprite: Sprite {
-                            custom_size: Some(vec2(sub_tile_size, sub_tile_size)),
-                            anchor: Anchor::BottomLeft,
+                            custom_size: Some(vec2(SUB_TILE_SIZE, SUB_TILE_SIZE)),
                             ..default()
                         },
                         transform: Transform::from_translation(Vec3::new(
-                            x * sub_tile_size,
-                            y * sub_tile_size,
+                            x * SUB_TILE_SIZE + SUB_TILE_SIZE / 2.,
+                            y * SUB_TILE_SIZE + SUB_TILE_SIZE / 2.,
                             -5.,
                         )),
                         ..default()
@@ -144,6 +143,52 @@ fn open_tile(
                 }
             }
         });
+
+    let mut tree_positions = vec![];
+
+    for _ in 0..rng.gen_range(10..20) {
+        let x = rng.gen_range(0..SUB_TILES as usize);
+        let y = rng.gen_range(0..SUB_TILES as usize);
+
+        if tree_positions.contains(&(x, y)) {
+            continue;
+        }
+
+        tree_positions.push((x, y));
+
+        commands
+            .spawn(SpriteSheetBundle {
+                atlas: tree_assets.atlas(),
+                texture: tree_assets.texture(),
+                sprite: Sprite {
+                    custom_size: Some(vec2(TREE_SPRITE_SIZE, TREE_SPRITE_SIZE)),
+                    ..default()
+                },
+                transform: Transform::from_translation(Vec3::new(
+                    tile_x + x as f32 * 16. - TILE_SIZE / 2. + SUB_TILE_SIZE / 2.,
+                    tile_y + y as f32 * 16. - TILE_SIZE / 2. + SUB_TILE_SIZE / 2.,
+                    -2.,
+                )),
+
+                ..default()
+            })
+            .with_children(|parent| {
+                parent.spawn((
+                    SpatialBundle {
+                        transform: Transform::from_translation(Vec3::new(
+                            0.,
+                            -TREE_SPRITE_SIZE / 4.,
+                            0.,
+                        )),
+                        ..default()
+                    },
+                    RigidBody::Static,
+                    Collider::circle(TREE_SPRITE_SIZE / 4.),
+                    CollisionLayers::new(PhysicsLayers::Tree, LayerMask::ALL),
+                    Restitution::new(0.),
+                ));
+            });
+    }
 }
 
 fn closed_tile(commands: &mut Commands, x: isize, y: isize) {
@@ -228,7 +273,8 @@ fn activate_tiles(
     mut commands: Commands,
     mut activate_tile_event: EventReader<ActivateTileEvent>,
     closed_tiles: Query<&Transform, With<CloseTile>>,
-    tile_assets: Res<ForestAssets>,
+    ground_assets: Res<ForestGroundAssets>,
+    tree_assets: Res<TreeAssets>,
 ) {
     activate_tile_event
         .read()
@@ -245,8 +291,8 @@ fn activate_tiles(
                 &mut commands,
                 grid_pos.x as isize,
                 grid_pos.y as isize,
-                &tile_assets.layout,
-                &tile_assets.texture,
+                &ground_assets,
+                &tree_assets,
             )
         })
 }

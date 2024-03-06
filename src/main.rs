@@ -37,6 +37,7 @@ pub enum PhysicsLayers {
     Mob,
     Entity,
     Wall,
+    Tree,
     ClosedTile,
     Spell,
 }
